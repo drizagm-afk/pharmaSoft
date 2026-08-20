@@ -2,10 +2,10 @@ package com.edu.upeu.PharmaBackend.service.generic;
 
 import java.util.Optional;
 
-public interface CrudService<T, ID> {
-    T create(T t);
-    T update(T t);
-    Optional<T> read(ID id);
+public interface CrudService<REQ, RES, ID> {
+    RES create(REQ req);
+    RES update(ID id, REQ req);
+    RES read(ID id);
     void delete(ID id);
-    Iterable<T> readAll();
+    Iterable<RES> readAll();
 }
