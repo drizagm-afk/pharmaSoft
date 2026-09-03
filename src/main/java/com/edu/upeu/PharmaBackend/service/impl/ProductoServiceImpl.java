@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -90,7 +91,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional(readOnly = true)
-    public Iterable<ProductoResponseDTO> readAll() {
+    public List<ProductoResponseDTO> readAll() {
         return productoRepository.findAll()
                 .stream()
                 .map(ProductoMapper::ConvertToResponse)
