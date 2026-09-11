@@ -2,12 +2,17 @@ package com.edu.upeu.PharmaBackend.controller;
 
 import com.edu.upeu.PharmaBackend.dto.VentaRequestDTO;
 import com.edu.upeu.PharmaBackend.dto.VentaResponseDTO;
+import com.edu.upeu.PharmaBackend.enums.EstadoVenta;
 import com.edu.upeu.PharmaBackend.service.service.VentaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -38,5 +43,32 @@ public class VentaController {
         VentaResponseDTO ventaResponseDTO = ventaService.create(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ventaResponseDTO);
+    }
+
+    //BUSCAR
+    @GetMapping("/buscar")
+    public ResponseEntity<List<VentaResponseDTO>> buscar(
+            @RequestParam(required = false) Long clienteId,
+            @RequestParam(required = false) EstadoVenta estado,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate desde,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate hasta,
+            @RequestParam(required = false, defaultValue = "fecha")
+            String ordenarPor,
+            @RequestParam(required = false, defaultValue = "desc")
+            String direccion) {
+        return ResponseEntity.ok(
+                ventaService.buscar(
+                        clienteId,
+                        estado,
+                        desde,
+                        hasta,
+                        ordenarPor,
+                        direccion
+                )
+        );
     }
 }
