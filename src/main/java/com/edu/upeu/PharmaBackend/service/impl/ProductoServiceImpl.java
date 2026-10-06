@@ -17,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponseDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -83,10 +86,13 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional
     public void delete(Long id) {
-        if (!productoRepository.existsById(id))
-            throw new RecursosNoEncontradosException("Producto no encontrado con id: " + id);
-
-        productoRepository.deleteById(id);
+        Producto producto = productoRepository.findById(id).orElseThrow(() ->
+                new RecursosNoEncontradosException("Producto no encontrado con id: " + id));
+        if (!Boolean.TRUE.equals(producto.getEstado())) {
+            throw new ReglaNegocioException("El producto ya se encuentra inactivo.");
+        }
+        producto.setEstado(false);
+        productoRepository.save(producto);
     }
 
     @Override
@@ -97,4 +103,25 @@ public class ProductoServiceImpl implements ProductoService {
                 .map(ProductoMapper::ConvertToResponse)
                 .toList();
     }
+    @Override
+    @Transactional(readOnly = true)
+    public PaginaResponseDTO<ProductoResponseDTO> listar(
+            int pagina, int tamanio, String ordenarPor, String direccion) {
+        if (pagina < 0 || tamanio < 1 || tamanio > 100) {
+            throw new ReglaNegocioException("La pagina debe ser mayor o igual a 0 y el tamano debe estar entre 1 y 100.");
+        }
+        if (ordenarPor == null || !Set.of("id", "nombre", "precio", "stock").contains(ordenarPor)) {
+            throw new ReglaNegocioException("El campo de orden no esta permitido.");
+        }
+        if (!"asc".equalsIgnoreCase(direccion) && !"desc".equalsIgnoreCase(direccion)) {
+            throw new ReglaNegocioException("La direccion debe ser asc o desc.");
+        }
+        Sort orden = Sort.by(Sort.Direction.fromString(direccion), ordenarPor);
+        if (!"id".equals(ordenarPor)) orden = orden.and(Sort.by("id"));
+        var resultado = productoRepository.findAll(PageRequest.of(pagina, tamanio, orden))
+                .map(ProductoMapper::ConvertToResponse);
+        return new PaginaResponseDTO<>(resultado.getContent(), resultado.getNumber(),
+                resultado.getSize(), resultado.getTotalElements(), resultado.getTotalPages(), resultado.isLast());
+    }
+
 }

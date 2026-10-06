@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponseDTO;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/clientes")
@@ -17,9 +20,20 @@ public class ClienteController {
 
     //READ
     @GetMapping
-    public ResponseEntity<Iterable<ClienteResponseDTO>> getClientes() {
+    public ResponseEntity<PaginaResponseDTO<ClienteResponseDTO>> getClientes(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanio,
+            @RequestParam(defaultValue = "apellidos") String ordenarPor,
+            @RequestParam(defaultValue = "asc") String direccion) {
+        return ResponseEntity.ok(clienteService.listar(pagina, tamanio, ordenarPor, direccion));
+    }
+
+    @GetMapping("/page/{page}/{pageSize}")
+    public ResponseEntity<List<ClienteResponseDTO>> getClientesPage(
+            @PathVariable int page, @PathVariable int pageSize
+    ) {
         return ResponseEntity.ok(
-                clienteService.readAll()
+                clienteService.readPage(page, pageSize)
         );
     }
 
@@ -48,12 +62,12 @@ public class ClienteController {
     ) {
         ClienteResponseDTO clienteResponseDTO = clienteService.update(id, request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteResponseDTO);
+        return ResponseEntity.ok(clienteResponseDTO);
     }
 
     //DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         clienteService.delete(id);
 
         return ResponseEntity.noContent().build();

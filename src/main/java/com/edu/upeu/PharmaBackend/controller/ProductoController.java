@@ -1,5 +1,6 @@
 package com.edu.upeu.PharmaBackend.controller;
 
+import com.edu.upeu.PharmaBackend.dto.PaginaResponseDTO;
 import com.edu.upeu.PharmaBackend.dto.ProductoRequestDTO;
 import com.edu.upeu.PharmaBackend.dto.ProductoResponseDTO;
 import com.edu.upeu.PharmaBackend.service.service.ProductoService;
@@ -17,10 +18,12 @@ public class ProductoController {
 
     //READ
     @GetMapping
-    public ResponseEntity<Iterable<ProductoResponseDTO>> getProductos() {
-        return ResponseEntity.ok(
-                productoService.readAll()
-        );
+    public ResponseEntity<PaginaResponseDTO<ProductoResponseDTO>> getProductos(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanio,
+            @RequestParam(defaultValue = "nombre") String ordenarPor,
+            @RequestParam(defaultValue = "asc") String direccion) {
+        return ResponseEntity.ok(productoService.listar(pagina, tamanio, ordenarPor, direccion));
     }
 
     @GetMapping("/{id}")
@@ -48,12 +51,12 @@ public class ProductoController {
     ) {
         ProductoResponseDTO productoResponseDTO = productoService.update(id, request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(productoResponseDTO);
+        return ResponseEntity.ok(productoResponseDTO);
     }
 
     //DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<ProductoResponseDTO> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         productoService.delete(id);
 
         return ResponseEntity.noContent().build();
