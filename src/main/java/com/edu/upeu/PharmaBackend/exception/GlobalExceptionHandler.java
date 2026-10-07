@@ -15,6 +15,16 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidJson(
+            org.springframework.http.converter.HttpMessageNotReadableException ex,
+            HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(new ErrorResponseDTO(
+                LocalDateTime.now(), 400, "Bad Request",
+                "El cuerpo JSON es inválido o contiene valores con un tipo incorrecto. El stock debe ser un entero.",
+                request.getRequestURI(), null));
+    }
+
     /*
      * Recurso no encontrado
      * HTTP 404

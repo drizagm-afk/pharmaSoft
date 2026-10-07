@@ -39,9 +39,11 @@ public class ProductoServiceImpl implements ProductoService {
             throw new ReglaNegocioException("Ya existe un producto con el nombre " + nombre);
 
         var categoriaId = request.getCategoriaId();
-        Categoria categoria = categoriaRepository.findById(categoriaId).orElseThrow(() ->
+        Categoria categoria = categoriaRepository.findByIdForUpdate(categoriaId).orElseThrow(() ->
                 new RecursosNoEncontradosException("Categoria no encontrada con id: " + categoriaId)
         );
+
+        validarCategoriaActiva(categoria);
 
         //CREATE
         Producto producto = new Producto();
@@ -58,7 +60,7 @@ public class ProductoServiceImpl implements ProductoService {
         request.setNombre(request.getNombre().trim());
 
         var categoriaId = request.getCategoriaId();
-        Categoria categoria = categoriaRepository.findById(categoriaId).orElseThrow(() ->
+        Categoria categoria = categoriaRepository.findByIdForUpdate(categoriaId).orElseThrow(() ->
                 new RecursosNoEncontradosException("Categoria no encontrada con id: " + categoriaId)
         );
 
@@ -67,10 +69,21 @@ public class ProductoServiceImpl implements ProductoService {
                 new RecursosNoEncontradosException("Producto no encontrado con id: " + id)
         );
 
+        validarCategoriaActiva(categoria);
+        if (productoRepository.existsByNombreIgnoreCaseAndIdNot(request.getNombre(), id)) {
+            throw new ReglaNegocioException("Ya existe un producto con el nombre " + request.getNombre());
+        }
+
         ProductoMapper.ConvertFromRequest(producto, request, categoria);
         productoRepository.save(producto);
 
         return ProductoMapper.ConvertToResponse(producto);
+    }
+
+    private void validarCategoriaActiva(Categoria categoria) {
+        if (!Boolean.TRUE.equals(categoria.getEstado())) {
+            throw new ReglaNegocioException("La categoría elegida está inactiva. Elija una categoría activa.");
+        }
     }
 
     @Override

@@ -49,9 +49,14 @@ public class CategoriaServiceImpl implements CategoriaService {
         request.setNombre(request.getNombre().trim());
 
         //UPDATE
-        Categoria categoria = categoriaRepository.findById(id).orElseThrow(() ->
+        Categoria categoria = categoriaRepository.findByIdForUpdate(id).orElseThrow(() ->
             new RecursosNoEncontradosException("Categoria no encontrada con id: " + id)
         );
+
+        if (!Boolean.TRUE.equals(request.getEstado())
+                && productoRepository.existsByCategoriaIdAndEstadoTrue(id)) {
+            throw new ReglaNegocioException("No se puede desactivar la categoría porque tiene productos activos. Reasigne o dé de baja esos productos antes de intentarlo de nuevo.");
+        }
 
         CategoriaMapper.ConvertFromRequest(categoria, request);
         categoriaRepository.save(categoria);

@@ -48,7 +48,7 @@ public class CategoriaController {
     ) {
         CategoriaResponseDTO categoriaResponseDTO = categoriaService.update(id, request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaResponseDTO);
+        return ResponseEntity.ok(categoriaResponseDTO);
     }
 
     //DELETE
