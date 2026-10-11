@@ -14,6 +14,9 @@ import com.edu.upeu.PharmaBackend.repository.ClienteRepository;
 import com.edu.upeu.PharmaBackend.service.service.ClienteService;
 
 import java.util.List;
+import java.util.Set;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
+import com.edu.upeu.PharmaBackend.service.support.Paginacion;
 
 @Service
 public class ClienteServiceImpl
@@ -114,6 +117,15 @@ public class ClienteServiceImpl
                 .stream()
                 .map(ClienteMapper::ConvertToResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginaResponse<ClienteResponseDTO> listar(int pagina, int tamanio,
+                                                    String ordenarPor, String direccion) {
+        var pageable = Paginacion.crear(pagina, tamanio, ordenarPor, direccion, "apellidos", "asc",
+                Set.of("id", "dni", "nombres", "apellidos", "email"));
+        return PaginaResponse.de(clienteRepository.findAll(pageable).map(ClienteMapper::ConvertToResponse));
     }
 
     @Override

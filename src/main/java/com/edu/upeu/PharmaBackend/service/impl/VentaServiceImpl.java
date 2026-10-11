@@ -6,7 +6,6 @@ import com.edu.upeu.PharmaBackend.mapper.VentaMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.edu.upeu.PharmaBackend.dto.DetalleVentaRequestDTO;
@@ -21,6 +20,8 @@ import com.edu.upeu.PharmaBackend.repository.ClienteRepository;
 import com.edu.upeu.PharmaBackend.repository.ProductoRepository;
 import com.edu.upeu.PharmaBackend.repository.VentaRepository;
 import com.edu.upeu.PharmaBackend.service.service.VentaService;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
+import com.edu.upeu.PharmaBackend.service.support.Paginacion;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -107,13 +108,15 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<VentaResponseDTO> buscar(
+    public PaginaResponse<VentaResponseDTO> buscar(
             Long clienteId,
             EstadoVenta estado,
             LocalDate desde,
             LocalDate hasta,
             String ordenarPor,
-            String direccion
+            String direccion,
+            int pagina,
+            int tamanio
     ) {
         long inicio = System.currentTimeMillis();
 
@@ -132,7 +135,8 @@ public class VentaServiceImpl implements VentaService {
                             + hasta + ")");
         }
 
-        Sort sort = construirSort(ordenarPor, direccion);
+        var pageable = Paginacion.crear(pagina, tamanio, ordenarPor, direccion,
+                ORDEN_POR_DEFECTO, "desc", CAMPOS_ORDENABLES);
 
         LocalDateTime desdeHora = (desde == null)
                 ? null
@@ -142,55 +146,23 @@ public class VentaServiceImpl implements VentaService {
                 ? null
                 : hasta.atTime(LocalTime.MAX);
 
-        List<VentaResponseDTO> resultado =
+        var resultado =
                 ventaRepository
-                        .buscar(clienteId, estado, desdeHora, hastaHora, sort)
-                        .stream()
-                        .map(VentaMapper::ConvertToResponse)
-                        .toList();
+                        .buscar(clienteId, estado, desdeHora, hastaHora, pageable)
+                        .map(VentaMapper::ConvertToResponse);
 
         logger.info("Fin buscar ventas | clienteId={} | estado={} | "
                         + "desde={} | hasta={} | orden={} {} | "
                         + "filas={} | duracionMs={}",
                 clienteId, estado, desde, hasta, ordenarPor, direccion,
-                resultado.size(),
+                resultado.getNumberOfElements(),
                 System.currentTimeMillis() - inicio);
 
-        return resultado;
+        return PaginaResponse.de(resultado);
     }
 
     //>>>> INTERNAL
     public static final String ORDEN_POR_DEFECTO = "fecha";
     public static final Set<String> CAMPOS_ORDENABLES = Set.of("id", "fecha", "total", "estado");
 
-    private Sort construirSort(String ordenarPor, String direccion) {
-        String campo = (ordenarPor == null || ordenarPor.isBlank())
-                ? ORDEN_POR_DEFECTO
-                : ordenarPor.trim();
-
-        if (!CAMPOS_ORDENABLES.contains(campo)) {
-            throw new ReglaNegocioException(
-                    "El campo de ordenamiento '"
-                            + campo
-                            + "' no está permitido. Campos válidos: "
-                            + CAMPOS_ORDENABLES);
-        }
-
-        String sentido = (direccion == null || direccion.isBlank())
-                ? "desc"
-                : direccion.trim();
-
-        if (!sentido.equalsIgnoreCase("asc")
-                && !sentido.equalsIgnoreCase("desc")) {
-            throw new ReglaNegocioException(
-                    "La dirección de ordenamiento '" + sentido +
-                    "' no está permitida. Valores válidos: asc, desc"
-            );
-        }
-
-        return sentido.
-                equalsIgnoreCase("asc")
-                ? Sort.by(campo).ascending()
-                : Sort.by(campo).descending();
-    }
 }
