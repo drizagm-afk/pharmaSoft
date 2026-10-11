@@ -4,6 +4,8 @@ import com.edu.upeu.PharmaBackend.enums.EstadoVenta;
 import com.edu.upeu.PharmaBackend.exception.RecursosNoEncontradosException;
 import com.edu.upeu.PharmaBackend.mapper.VentaMapper;
 import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class VentaServiceImpl implements VentaService {
     private final VentaRepository ventaRepository;
     private final ClienteRepository clienteRepository;
     private final ProductoRepository productoRepository;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
@@ -55,7 +59,11 @@ public class VentaServiceImpl implements VentaService {
 
         BigDecimal total = BigDecimal.ZERO;
 
-        for (DetalleVentaRequestDTO item : request.getDetalles()) {
+        // Acquire product locks in a consistent order for sales containing several products.
+        var detallesOrdenados = request.getDetalles().stream()
+                .sorted(Comparator.comparing(DetalleVentaRequestDTO::getProductoId))
+                .toList();
+        for (DetalleVentaRequestDTO item : detallesOrdenados) {
             Producto producto = productoRepository.findById(item.getProductoId()).orElseThrow(() ->
                     new RecursosNoEncontradosException("Producto no encontrado con id: " + item.getProductoId()));
 
@@ -63,8 +71,19 @@ public class VentaServiceImpl implements VentaService {
                 throw new ReglaNegocioException("El producto " + producto.getNombre() + " se encuentra inactivo");
             }
 
-            if (producto.getStock() < item.getCantidad()) {
-
+            int actualizados = productoRepository.descontarStock(
+                    producto.getId(), item.getCantidad(), LocalDateTime.now());
+            // Bulk updates bypass managed entities. Refresh before further reads or flushes.
+            // This also retrieves the current price/state while the product row is locked.
+            try {
+                entityManager.refresh(producto);
+            } catch (EntityNotFoundException ex) {
+                throw new RecursosNoEncontradosException("Producto no encontrado con id: " + item.getProductoId());
+            }
+            if (actualizados == 0) {
+                if (!Boolean.TRUE.equals(producto.getEstado())) {
+                    throw new ReglaNegocioException("El producto " + producto.getNombre() + " se encuentra inactivo");
+                }
                 throw new ReglaNegocioException("Stock insuficiente para " + producto.getNombre() + ". Disponible: " + producto.getStock()
                         + ", solicitado: " + item.getCantidad());
             }
@@ -82,7 +101,6 @@ public class VentaServiceImpl implements VentaService {
 
             total = total.add(subtotal);
 
-            producto.setStock(producto.getStock() - item.getCantidad());
         }
 
         venta.setTotal(total);
