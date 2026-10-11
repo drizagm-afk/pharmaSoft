@@ -208,10 +208,13 @@ public class ClienteServiceImpl
                                 )
                         );
 
-        clienteRepository.delete(cliente);
+        if (!Boolean.TRUE.equals(cliente.getEstado())) {
+            throw new ReglaNegocioException("El cliente ya está inactivo.");
+        }
+        cliente.setEstado(false);
 
         log.info(
-                "Cliente id={} eliminado correctamente",
+                "Cliente id={} desactivado correctamente",
                 id
         );
     }

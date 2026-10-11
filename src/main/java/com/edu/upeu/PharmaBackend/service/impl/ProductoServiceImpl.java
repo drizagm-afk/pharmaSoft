@@ -85,10 +85,12 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional
     public void delete(Long id) {
-        if (!productoRepository.existsById(id))
-            throw new RecursosNoEncontradosException("Producto no encontrado con id: " + id);
-
-        productoRepository.deleteById(id);
+        Producto producto = productoRepository.findById(id).orElseThrow(() ->
+                new RecursosNoEncontradosException("Producto no encontrado con id: " + id));
+        if (!Boolean.TRUE.equals(producto.getEstado())) {
+            throw new ReglaNegocioException("El producto ya está inactivo.");
+        }
+        producto.setEstado(false);
     }
 
     @Override

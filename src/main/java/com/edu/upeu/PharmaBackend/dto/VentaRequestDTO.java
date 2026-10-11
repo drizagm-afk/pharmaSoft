@@ -17,5 +17,5 @@ public class VentaRequestDTO {
 
     @NotEmpty(message = "La venta debe contener al menos un detalle")
     @Valid
-    private List<DetalleVentaRequestDTO> detalles;
+    private List<@NotNull(message = "El detalle no puede ser nulo") DetalleVentaRequestDTO> detalles;
 }

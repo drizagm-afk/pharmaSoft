@@ -7,6 +7,7 @@ import com.edu.upeu.PharmaBackend.exception.RecursosNoEncontradosException;
 import com.edu.upeu.PharmaBackend.exception.ReglaNegocioException;
 import com.edu.upeu.PharmaBackend.mapper.CategoriaMapper;
 import com.edu.upeu.PharmaBackend.repository.CategoriaRepository;
+import com.edu.upeu.PharmaBackend.repository.ProductoRepository;
 import com.edu.upeu.PharmaBackend.service.service.CategoriaService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -15,13 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CategoriaServiceImpl implements CategoriaService {
     private static final Logger logger = LoggerFactory.getLogger(CategoriaServiceImpl.class);
     private final CategoriaRepository categoriaRepository;
+    private final ProductoRepository productoRepository;
 
     @Override
     @Transactional
@@ -73,6 +74,9 @@ public class CategoriaServiceImpl implements CategoriaService {
         if (!categoriaRepository.existsById(id))
             throw new RecursosNoEncontradosException("Categoria no encontrada con id: " + id);
 
+        if (productoRepository.existsByCategoriaId(id)) {
+            throw new ReglaNegocioException("No se puede eliminar una categoría con productos asociados. Puede desactivarla desde Editar.");
+        }
         categoriaRepository.deleteById(id);
     }
 

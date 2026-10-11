@@ -1,37 +1,37 @@
 package com.edu.upeu.PharmaBackend.service.impl;
 
-import com.edu.upeu.PharmaBackend.enums.EstadoVenta;
-import com.edu.upeu.PharmaBackend.exception.RecursosNoEncontradosException;
-import com.edu.upeu.PharmaBackend.mapper.VentaMapper;
-import lombok.RequiredArgsConstructor;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.edu.upeu.PharmaBackend.dto.DetalleVentaRequestDTO;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 import com.edu.upeu.PharmaBackend.dto.VentaRequestDTO;
 import com.edu.upeu.PharmaBackend.dto.VentaResponseDTO;
 import com.edu.upeu.PharmaBackend.entity.Cliente;
 import com.edu.upeu.PharmaBackend.entity.DetalleVenta;
 import com.edu.upeu.PharmaBackend.entity.Producto;
 import com.edu.upeu.PharmaBackend.entity.Venta;
+import com.edu.upeu.PharmaBackend.enums.EstadoVenta;
+import com.edu.upeu.PharmaBackend.exception.RecursosNoEncontradosException;
 import com.edu.upeu.PharmaBackend.exception.ReglaNegocioException;
+import com.edu.upeu.PharmaBackend.mapper.VentaMapper;
 import com.edu.upeu.PharmaBackend.repository.ClienteRepository;
 import com.edu.upeu.PharmaBackend.repository.ProductoRepository;
 import com.edu.upeu.PharmaBackend.repository.VentaRepository;
 import com.edu.upeu.PharmaBackend.service.service.VentaService;
-import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 import com.edu.upeu.PharmaBackend.service.support.Paginacion;
+import com.edu.upeu.PharmaBackend.service.support.RangoFechas;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -64,30 +64,7 @@ public class VentaServiceImpl implements VentaService {
                 .sorted(Comparator.comparing(DetalleVentaRequestDTO::getProductoId))
                 .toList();
         for (DetalleVentaRequestDTO item : detallesOrdenados) {
-            Producto producto = productoRepository.findById(item.getProductoId()).orElseThrow(() ->
-                    new RecursosNoEncontradosException("Producto no encontrado con id: " + item.getProductoId()));
-
-            if (!Boolean.TRUE.equals(producto.getEstado())) {
-                throw new ReglaNegocioException("El producto " + producto.getNombre() + " se encuentra inactivo");
-            }
-
-            int actualizados = productoRepository.descontarStock(
-                    producto.getId(), item.getCantidad(), LocalDateTime.now());
-            // Bulk updates bypass managed entities. Refresh before further reads or flushes.
-            // This also retrieves the current price/state while the product row is locked.
-            try {
-                entityManager.refresh(producto);
-            } catch (EntityNotFoundException ex) {
-                throw new RecursosNoEncontradosException("Producto no encontrado con id: " + item.getProductoId());
-            }
-            if (actualizados == 0) {
-                if (!Boolean.TRUE.equals(producto.getEstado())) {
-                    throw new ReglaNegocioException("El producto " + producto.getNombre() + " se encuentra inactivo");
-                }
-                throw new ReglaNegocioException("Stock insuficiente para " + producto.getNombre() + ". Disponible: " + producto.getStock()
-                        + ", solicitado: " + item.getCantidad());
-            }
-
+            Producto producto = reservarProducto(item);
             BigDecimal subtotal = producto.getPrecio().multiply(BigDecimal.valueOf(item.getCantidad()));
 
             DetalleVenta detalle = new DetalleVenta();
@@ -118,6 +95,34 @@ public class VentaServiceImpl implements VentaService {
         return VentaMapper.ConvertToResponse(venta);
     }
 
+    private Producto reservarProducto(DetalleVentaRequestDTO item) {
+        Producto producto = productoRepository.findById(item.getProductoId()).orElseThrow(() ->
+                new RecursosNoEncontradosException("Producto no encontrado con id: " + item.getProductoId()));
+
+        if (!Boolean.TRUE.equals(producto.getEstado())) {
+            throw new ReglaNegocioException("El producto " + producto.getNombre() + " se encuentra inactivo");
+        }
+
+        int actualizados = productoRepository.descontarStock(
+                producto.getId(), item.getCantidad(), LocalDateTime.now());
+        // Bulk updates bypass managed entities. Refresh before further reads or flushes.
+        // This also retrieves the current price/state while the product row is locked.
+        try {
+            entityManager.refresh(producto);
+        } catch (EntityNotFoundException ex) {
+            throw new RecursosNoEncontradosException("Producto no encontrado con id: " + item.getProductoId());
+        }
+        if (actualizados == 0) {
+            if (!Boolean.TRUE.equals(producto.getEstado())) {
+                throw new ReglaNegocioException("El producto " + producto.getNombre() + " se encuentra inactivo");
+            }
+            throw new ReglaNegocioException("Stock insuficiente para " + producto.getNombre() + ". Disponible: " + producto.getStock()
+                    + ", solicitado: " + item.getCantidad());
+        }
+
+        return producto;
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<VentaResponseDTO> readAll() {
@@ -142,31 +147,14 @@ public class VentaServiceImpl implements VentaService {
                         + "desde={} | hasta={} | ordenarPor={} | direccion={}",
                 clienteId, estado, desde, hasta, ordenarPor, direccion);
 
-        if (desde != null
-                && hasta != null
-                && desde.isAfter(hasta)) {
-
-            throw new ReglaNegocioException(
-                    "El rango de fechas es inválido: 'desde' ("
-                            + desde
-                            + ") es posterior a 'hasta' ("
-                            + hasta + ")");
-        }
+        var rango = RangoFechas.de(desde, hasta);
 
         var pageable = Paginacion.crear(pagina, tamanio, ordenarPor, direccion,
                 ORDEN_POR_DEFECTO, "desc", CAMPOS_ORDENABLES);
 
-        LocalDateTime desdeHora = (desde == null)
-                ? null
-                : desde.atStartOfDay();
-
-        LocalDateTime hastaHora = (hasta == null)
-                ? null
-                : hasta.atTime(LocalTime.MAX);
-
         var resultado =
                 ventaRepository
-                        .buscar(clienteId, estado, desdeHora, hastaHora, pageable)
+                        .buscar(clienteId, estado, rango.desde(), rango.hasta(), pageable)
                         .map(VentaMapper::ConvertToResponse);
 
         logger.info("Fin buscar ventas | clienteId={} | estado={} | "
