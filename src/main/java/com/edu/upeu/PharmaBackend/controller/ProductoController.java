@@ -2,6 +2,7 @@ package com.edu.upeu.PharmaBackend.controller;
 
 import com.edu.upeu.PharmaBackend.dto.ProductoRequestDTO;
 import com.edu.upeu.PharmaBackend.dto.ProductoResponseDTO;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 import com.edu.upeu.PharmaBackend.service.service.ProductoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,13 @@ public class ProductoController {
 
     //READ
     @GetMapping
-    public ResponseEntity<Iterable<ProductoResponseDTO>> getProductos() {
+    public ResponseEntity<PaginaResponse<ProductoResponseDTO>> getProductos(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanio,
+            @RequestParam(defaultValue = "nombre") String ordenarPor,
+            @RequestParam(defaultValue = "asc") String direccion) {
         return ResponseEntity.ok(
-                productoService.readAll()
+                productoService.listar(pagina, tamanio, ordenarPor, direccion)
         );
     }
 

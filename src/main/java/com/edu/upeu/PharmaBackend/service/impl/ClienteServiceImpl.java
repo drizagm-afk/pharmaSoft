@@ -14,6 +14,9 @@ import com.edu.upeu.PharmaBackend.repository.ClienteRepository;
 import com.edu.upeu.PharmaBackend.service.service.ClienteService;
 
 import java.util.List;
+import java.util.Set;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
+import com.edu.upeu.PharmaBackend.service.support.Paginacion;
 
 @Service
 public class ClienteServiceImpl
@@ -117,6 +120,15 @@ public class ClienteServiceImpl
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public PaginaResponse<ClienteResponseDTO> listar(int pagina, int tamanio,
+                                                    String ordenarPor, String direccion) {
+        var pageable = Paginacion.crear(pagina, tamanio, ordenarPor, direccion, "apellidos", "asc",
+                Set.of("id", "dni", "nombres", "apellidos", "email"));
+        return PaginaResponse.de(clienteRepository.findAll(pageable).map(ClienteMapper::ConvertToResponse));
+    }
+
+    @Override
     @Transactional
     public ClienteResponseDTO update(
             Long id,
@@ -196,10 +208,13 @@ public class ClienteServiceImpl
                                 )
                         );
 
-        clienteRepository.delete(cliente);
+        if (!Boolean.TRUE.equals(cliente.getEstado())) {
+            throw new ReglaNegocioException("El cliente ya está inactivo.");
+        }
+        cliente.setEstado(false);
 
         log.info(
-                "Cliente id={} eliminado correctamente",
+                "Cliente id={} desactivado correctamente",
                 id
         );
     }

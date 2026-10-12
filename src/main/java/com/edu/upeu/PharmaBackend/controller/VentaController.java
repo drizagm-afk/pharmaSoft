@@ -2,6 +2,7 @@ package com.edu.upeu.PharmaBackend.controller;
 
 import com.edu.upeu.PharmaBackend.dto.VentaRequestDTO;
 import com.edu.upeu.PharmaBackend.dto.VentaResponseDTO;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 import com.edu.upeu.PharmaBackend.enums.EstadoVenta;
 import com.edu.upeu.PharmaBackend.service.service.VentaService;
 import jakarta.validation.Valid;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -47,7 +47,7 @@ public class VentaController {
 
     //BUSCAR
     @GetMapping("/buscar")
-    public ResponseEntity<List<VentaResponseDTO>> buscar(
+    public ResponseEntity<PaginaResponse<VentaResponseDTO>> buscar(
             @RequestParam(required = false) Long clienteId,
             @RequestParam(required = false) EstadoVenta estado,
             @RequestParam(required = false)
@@ -59,7 +59,9 @@ public class VentaController {
             @RequestParam(required = false, defaultValue = "fecha")
             String ordenarPor,
             @RequestParam(required = false, defaultValue = "desc")
-            String direccion) {
+            String direccion,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanio) {
         return ResponseEntity.ok(
                 ventaService.buscar(
                         clienteId,
@@ -67,7 +69,9 @@ public class VentaController {
                         desde,
                         hasta,
                         ordenarPor,
-                        direccion
+                        direccion,
+                        pagina,
+                        tamanio
                 )
         );
     }

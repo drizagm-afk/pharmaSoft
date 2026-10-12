@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
+import com.edu.upeu.PharmaBackend.service.support.Paginacion;
 
 @Service
 @RequiredArgsConstructor
@@ -83,10 +85,12 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional
     public void delete(Long id) {
-        if (!productoRepository.existsById(id))
-            throw new RecursosNoEncontradosException("Producto no encontrado con id: " + id);
-
-        productoRepository.deleteById(id);
+        Producto producto = productoRepository.findById(id).orElseThrow(() ->
+                new RecursosNoEncontradosException("Producto no encontrado con id: " + id));
+        if (!Boolean.TRUE.equals(producto.getEstado())) {
+            throw new ReglaNegocioException("El producto ya está inactivo.");
+        }
+        producto.setEstado(false);
     }
 
     @Override
@@ -96,5 +100,14 @@ public class ProductoServiceImpl implements ProductoService {
                 .stream()
                 .map(ProductoMapper::ConvertToResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginaResponse<ProductoResponseDTO> listar(int pagina, int tamanio,
+                                                     String ordenarPor, String direccion) {
+        var pageable = Paginacion.crear(pagina, tamanio, ordenarPor, direccion, "nombre", "asc",
+                Set.of("id", "nombre", "precio", "stock"));
+        return PaginaResponse.de(productoRepository.findAll(pageable).map(ProductoMapper::ConvertToResponse));
     }
 }

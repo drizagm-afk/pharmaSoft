@@ -2,109 +2,41 @@ package com.edu.upeu.PharmaBackend.service.impl;
 
 import com.edu.upeu.PharmaBackend.dto.reporte.ProductoMasVendidoDTO;
 import com.edu.upeu.PharmaBackend.dto.reporte.VentaPorCategoriaDTO;
-import com.edu.upeu.PharmaBackend.exception.ReglaNegocioException;
 import com.edu.upeu.PharmaBackend.repository.VentaRepository;
 import com.edu.upeu.PharmaBackend.service.service.ReporteService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.edu.upeu.PharmaBackend.service.support.RangoFechas;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReporteServiceImpl implements ReporteService {
-    private static final Logger logger =
-            LoggerFactory.getLogger(ReporteServiceImpl.class);
-
     private final VentaRepository ventaRepository;
 
-    public ReporteServiceImpl(
-            VentaRepository ventaRepository) {
-
-        this.ventaRepository = ventaRepository;
-    }
-
     @Override
-    @Transactional(readOnly = true)
-    public List<VentaPorCategoriaDTO> ventasPorCategoria(
-            LocalDate desde,
-            LocalDate hasta) {
+    public List<VentaPorCategoriaDTO> ventasPorCategoria(LocalDate desde, LocalDate hasta) {
+        var rango = RangoFechas.de(desde, hasta);
         long inicio = System.currentTimeMillis();
-
-        logger.info("Inicio reporte ventas por categoria | desde={} | hasta={}",
-                desde, hasta);
-
-        validarRango(desde, hasta);
-
-        List<VentaPorCategoriaDTO> resultado =
-                ventaRepository.reporteVentasPorCategoria(
-                        inicioDelDia(desde),
-                        finDelDia(hasta)
-                );
-
-        logger.info("Fin reporte ventas por categoria | desde={} | hasta={} | "
-                        + "filas={} | duracionMs={}",
-                desde, hasta,
-                resultado.size(),
-                System.currentTimeMillis() - inicio);
-
+        var resultado = ventaRepository.reporteVentasPorCategoria(rango.desde(), rango.hasta());
+        log.info("Reporte ventas por categoria | desde={} | hasta={} | filas={} | duracionMs={}",
+                desde, hasta, resultado.size(), System.currentTimeMillis() - inicio);
         return resultado;
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<ProductoMasVendidoDTO> productosMasVendidos(
-            LocalDate desde,
-            LocalDate hasta
-    ) {
+    public List<ProductoMasVendidoDTO> productosMasVendidos(LocalDate desde, LocalDate hasta) {
+        var rango = RangoFechas.de(desde, hasta);
         long inicio = System.currentTimeMillis();
-
-        logger.info("Inicio reporte productos mas vendidos | desde={} | hasta={}",
-                desde, hasta);
-
-        validarRango(desde, hasta);
-
-        List<ProductoMasVendidoDTO> resultado =
-                ventaRepository.reporteProductosMasVendidos(
-                        inicioDelDia(desde),
-                        finDelDia(hasta)
-                );
-
-        logger.info("Fin reporte productos mas vendidos | desde={} | hasta={} | "
-                        + "filas={} | duracionMs={}",
-                desde, hasta,
-                resultado.size(),
-                System.currentTimeMillis() - inicio);
-
+        var resultado = ventaRepository.reporteProductosMasVendidos(rango.desde(), rango.hasta());
+        log.info("Reporte productos mas vendidos | desde={} | hasta={} | filas={} | duracionMs={}",
+                desde, hasta, resultado.size(), System.currentTimeMillis() - inicio);
         return resultado;
-    }
-
-    private void validarRango(LocalDate desde, LocalDate hasta) {
-        if (desde != null
-                && hasta != null
-                && desde.isAfter(hasta)) {
-
-            throw new ReglaNegocioException(
-                    "El rango de fechas es inválido: 'desde' ("
-                            + desde
-                            + ") es posterior a 'hasta' ("
-                            + hasta + ")");
-        }
-    }
-
-    private LocalDateTime inicioDelDia(LocalDate fecha) {
-        return (fecha == null)
-                ? null
-                : fecha.atStartOfDay();
-    }
-
-    private LocalDateTime finDelDia(LocalDate fecha) {
-        return (fecha == null)
-                ? null
-                : fecha.atTime(LocalTime.MAX);
     }
 }
