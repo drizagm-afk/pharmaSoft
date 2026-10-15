@@ -15,6 +15,23 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAuthentication(
+            org.springframework.security.core.AuthenticationException ex, HttpServletRequest request) {
+        return respuesta(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos", request, null);
+    }
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAccessDenied(
+            org.springframework.security.access.AccessDeniedException ex, HttpServletRequest request) {
+        return respuesta(HttpStatus.FORBIDDEN, "No tiene permisos para realizar esta operación", request, null);
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleConflict(
+            org.springframework.dao.DataIntegrityViolationException ex, HttpServletRequest request) {
+        return respuesta(HttpStatus.CONFLICT, "La operación entra en conflicto con un registro existente", request, null);
+    }
     @ExceptionHandler(RecursosNoEncontradosException.class)
     public ResponseEntity<ErrorResponseDTO> handleNotFound(
             RecursosNoEncontradosException ex, HttpServletRequest request) {
