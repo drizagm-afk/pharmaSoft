@@ -27,6 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /** Opt-in Oracle checks. Every test owns its fixtures and removes only those fixtures. */
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.springframework.security.test.context.support.WithMockUser(authorities = {
+        "CATALOGO_LEER", "CATALOGO_ESCRIBIR", "CLIENTES_LEER", "CLIENTES_ESCRIBIR",
+        "VENTAS_LEER", "VENTAS_REGISTRAR", "REPORTES_VER"})
 @EnabledIfSystemProperty(named = "pharma.integration", matches = "true")
 class VentasIntegrationTest {
     @Autowired MockMvc mvc;

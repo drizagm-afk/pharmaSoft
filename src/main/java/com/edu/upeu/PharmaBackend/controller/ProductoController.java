@@ -53,7 +53,7 @@ public class ProductoController {
     ) {
         ProductoResponseDTO productoResponseDTO = productoService.update(id, request);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(productoResponseDTO);
+        return ResponseEntity.ok(productoResponseDTO);
     }
 
     //DELETE

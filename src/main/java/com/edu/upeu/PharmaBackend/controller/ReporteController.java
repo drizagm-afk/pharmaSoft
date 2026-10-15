@@ -14,6 +14,7 @@ import com.edu.upeu.PharmaBackend.service.service.ReporteService;
 import java.time.LocalDate;
 import java.util.List;
 
+@org.springframework.security.access.prepost.PreAuthorize("hasAuthority('REPORTES_VER')")
 @RestController
 @RequestMapping("/api/v1/reportes")
 @RequiredArgsConstructor
