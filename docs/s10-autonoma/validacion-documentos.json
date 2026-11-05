@@ -1,0 +1,25 @@
+{
+  "informe-s10.pdf": {
+    "pages": 3,
+    "images": 3,
+    "outOfBoundsText": 0,
+    "bytes": 571810
+  },
+  "DelCarpio_LP2_S10_Autonoma.pdf": {
+    "pages": 3,
+    "images": 3,
+    "outOfBoundsText": 0,
+    "bytes": 571810
+  },
+  "DelCarpio_LP2_S10_Matriz_Evidencias.pdf": {
+    "pages": 95,
+    "images": 92,
+    "outOfBoundsText": 0,
+    "bytes": 17816956
+  },
+  "cases": 28,
+  "figures": 92,
+  "originalHashesVerified": true,
+  "visualReview": "Tres páginas del informe y 95 páginas del anexo revisadas; matriz y figuras sin recortes ni superposiciones.",
+  "commitsMade": false
+}

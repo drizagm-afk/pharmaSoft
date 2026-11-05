@@ -1,5 +1,12 @@
 package com.edu.upeu.PharmaBackend.controller;
 
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.core.Authentication;
+import com.edu.upeu.PharmaBackend.dto.auth.AsignarRolesRequestDTO;
+import com.edu.upeu.PharmaBackend.dto.auth.CambiarEstadoUsuarioRequestDTO;
+
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 
@@ -25,6 +32,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 public class UsuarioController {
+    @PutMapping("/usuarios/{id}/roles")
+    public ResponseEntity<UsuarioResponseDTO> asignarRoles(
+            @PathVariable Long id,
+            @Valid @RequestBody AsignarRolesRequestDTO request,
+            Authentication authentication) {
+        return ResponseEntity.ok(usuarioService.asignarRoles(id, request.rolIds(), authentication.getName()));
+    }
+
+    @PatchMapping("/usuarios/{id}/estado")
+    public ResponseEntity<UsuarioResponseDTO> cambiarEstado(
+            @PathVariable Long id,
+            @Valid @RequestBody CambiarEstadoUsuarioRequestDTO request,
+            Authentication authentication) {
+        return ResponseEntity.ok(usuarioService.cambiarEstado(id, request.estado(), authentication.getName()));
+    }
 
     private final UsuarioService usuarioService;
 

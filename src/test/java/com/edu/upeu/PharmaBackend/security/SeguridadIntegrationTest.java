@@ -1,5 +1,7 @@
 package com.edu.upeu.PharmaBackend.security;
 
+import org.junit.jupiter.params.provider.ValueSource;
+
 import com.edu.upeu.PharmaBackend.entity.*;
 import com.edu.upeu.PharmaBackend.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,171 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 class SeguridadIntegrationTest {
+    private String cambioPassword(String actual, String nueva) {
+        return "{\"passwordActual\":\"" + actual + "\",\"passwordNueva\":\"" + nueva + "\"}";
+    }
+
+    @Test
+    void passwordActualIncorrectaNoModificaHash() throws Exception {
+        String anterior = usuarios.findByUsernameIgnoreCase("vendedor").orElseThrow().getPassword();
+        mvc.perform(put("/api/v1/auth/password").header("Authorization", bearer("vendedor"))
+                .contentType(MediaType.APPLICATION_JSON).content(cambioPassword("Incorrecta2026", "NuevaClave2026")))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.message").value("La contraseña actual no es correcta"));
+        assertThat(usuarios.findByUsernameIgnoreCase("vendedor").orElseThrow().getPassword()).isEqualTo(anterior);
+    }
+
+    @Test
+    void passwordNuevaDebeSerDistinta() throws Exception {
+        mvc.perform(put("/api/v1/auth/password").header("Authorization", bearer("vendedor"))
+                .contentType(MediaType.APPLICATION_JSON).content(cambioPassword("Password2026*", "Password2026*")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("La nueva contraseña debe ser distinta de la actual"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "abc123", "abcdefgh", "12345678"})
+    void passwordNuevaInvalida(String nueva) throws Exception {
+        mvc.perform(put("/api/v1/auth/password").header("Authorization", bearer("vendedor"))
+                .contentType(MediaType.APPLICATION_JSON).content(cambioPassword("Password2026*", nueva)))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.validationErrors.passwordNueva").exists());
+    }
+
+    @Test
+    void limitesPasswordAsciiYUtf8() throws Exception {
+        String token = bearer("vendedor");
+        mvc.perform(put("/api/v1/auth/password").header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON).content(cambioPassword("Password2026*", "a1" + "x".repeat(71))))
+                .andExpect(status().isBadRequest());
+        mvc.perform(put("/api/v1/auth/password").header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON).content(cambioPassword("Password2026*", "a1" + "ñ".repeat(36))))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.message").value("La contraseña no puede superar 72 bytes"));
+        mvc.perform(put("/api/v1/auth/password").header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON).content(cambioPassword("a1" + "ñ".repeat(36), "NuevaClave2026")))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void passwordNuevaBcryptYTokenPrevioPermaneceValido() throws Exception {
+        String token = bearer("vendedor");
+        String hashAdmin = usuarios.findByUsernameIgnoreCase("admin").orElseThrow().getPassword();
+        mvc.perform(put("/api/v1/auth/password").header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON).content(cambioPassword("Password2026*", "NuevaClave2026")))
+                .andExpect(status().isNoContent()).andExpect(content().string(""));
+        assertThat(new BCryptPasswordEncoder().matches("NuevaClave2026",
+                usuarios.findByUsernameIgnoreCase("vendedor").orElseThrow().getPassword())).isTrue();
+        assertThat(usuarios.findByUsernameIgnoreCase("admin").orElseThrow().getPassword()).isEqualTo(hashAdmin);
+        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"vendedor\",\"password\":\"Password2026*\"}"))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"vendedor\",\"password\":\"NuevaClave2026\"}"))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/v1/productos").header("Authorization", token)).andExpect(status().isOk());
+    }
+
+    @Test
+    void todosLosRolesPuedenCambiarSuPropiaPasswordPeroSinTokenNo() throws Exception {
+        for (String nombre : List.of("admin", "almacen", "supervisor")) {
+            mvc.perform(put("/api/v1/auth/password").header("Authorization", bearer(nombre))
+                    .contentType(MediaType.APPLICATION_JSON).content(cambioPassword("Password2026*", "NuevaClave2026")))
+                    .andExpect(status().isNoContent());
+        }
+        mvc.perform(put("/api/v1/auth/password").contentType(MediaType.APPLICATION_JSON)
+                .content(cambioPassword("Password2026*", "NuevaClave2026"))).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void rolesSeReemplazanYSeRecarganConElMismoToken() throws Exception {
+        String token = bearer("vendedor");
+        Long id = usuarios.findByUsernameIgnoreCase("vendedor").orElseThrow().getId();
+        Long almacen = roles.findAll().stream().filter(r -> r.getNombre().equals("ALMACENERO")).findFirst().orElseThrow().getId();
+        Long admin = roles.findAll().stream().filter(r -> r.getNombre().equals("ADMIN")).findFirst().orElseThrow().getId();
+        mvc.perform(get("/api/v1/reportes/ventas-por-categoria").header("Authorization", token)).andExpect(status().isForbidden());
+        mvc.perform(put("/api/v1/usuarios/" + id + "/roles").header("Authorization", bearer("admin"))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"rolIds\":[" + admin + "]}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.roles[0]").value("ADMIN"));
+        mvc.perform(get("/api/v1/reportes/ventas-por-categoria").header("Authorization", token)).andExpect(status().isOk());
+        mvc.perform(put("/api/v1/usuarios/" + id + "/roles").header("Authorization", bearer("admin"))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"rolIds\":[" + almacen + "]}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.roles[0]").value("ALMACENERO"));
+        assertThat(usuarios.findById(id).orElseThrow().getRoles()).extracting(Rol::getNombre).containsExactly("ALMACENERO");
+        mvc.perform(get("/api/v1/reportes/ventas-por-categoria").header("Authorization", token)).andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/clientes").header("Authorization", token)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void rolesInvalidosYUsuariosInexistentes() throws Exception {
+        Long id = usuarios.findByUsernameIgnoreCase("vendedor").orElseThrow().getId();
+        for (String body : List.of("{\"rolIds\":[]}", "{\"rolIds\":[null]}", "{}")) {
+            mvc.perform(put("/api/v1/usuarios/" + id + "/roles").header("Authorization", bearer("admin"))
+                    .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isBadRequest());
+        }
+        mvc.perform(put("/api/v1/usuarios/999999/roles").header("Authorization", bearer("admin"))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"rolIds\":[" + vendedorRol + "]}"))
+                .andExpect(status().isNotFound());
+        mvc.perform(put("/api/v1/usuarios/" + id + "/roles").header("Authorization", bearer("admin"))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"rolIds\":[999999]}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void adminNoPuedeQuitarseAdminNiDesactivarse() throws Exception {
+        Long id = usuarios.findByUsernameIgnoreCase("admin").orElseThrow().getId();
+        String token = bearer("admin");
+        mvc.perform(put("/api/v1/usuarios/" + id + "/roles").header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"rolIds\":[" + vendedorRol + "]}"))
+                .andExpect(status().isConflict());
+        mvc.perform(patch("/api/v1/usuarios/" + id + "/estado").header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"estado\":false}"))
+                .andExpect(status().isConflict());
+        assertThat(usuarios.findById(id).orElseThrow().getEstado()).isTrue();
+        assertThat(usuarios.findById(id).orElseThrow().getRoles()).extracting(Rol::getNombre).containsExactly("ADMIN");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"vendedor", "almacen", "supervisor"})
+    void soloAdminAdministraRolesYEstado(String nombre) throws Exception {
+        Long id = usuarios.findByUsernameIgnoreCase("vendedor").orElseThrow().getId();
+        String token = bearer(nombre);
+        mvc.perform(put("/api/v1/usuarios/" + id + "/roles").header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"rolIds\":[" + vendedorRol + "]}"))
+                .andExpect(status().isForbidden());
+        mvc.perform(patch("/api/v1/usuarios/" + id + "/estado").header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"estado\":false}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void desactivacionRevocaTokenYLoginYReactivacionRestauraAcceso() throws Exception {
+        String token = bearer("vendedor");
+        Long id = usuarios.findByUsernameIgnoreCase("vendedor").orElseThrow().getId();
+        mvc.perform(patch("/api/v1/usuarios/" + id + "/estado").header("Authorization", bearer("admin"))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"estado\":false}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.estado").value(false));
+        mvc.perform(get("/api/v1/productos").header("Authorization", token))
+                .andExpect(status().isUnauthorized()).andExpect(jsonPath("$.message").value("El usuario está deshabilitado"));
+        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"vendedor\",\"password\":\"Password2026*\"}"))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(patch("/api/v1/usuarios/" + id + "/estado").header("Authorization", bearer("admin"))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"estado\":true}"))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/v1/productos").header("Authorization", token)).andExpect(status().isOk());
+        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"vendedor\",\"password\":\"Password2026*\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void estadoObligatorioYUsuarioInexistente() throws Exception {
+        Long id = usuarios.findByUsernameIgnoreCase("vendedor").orElseThrow().getId();
+        mvc.perform(patch("/api/v1/usuarios/" + id + "/estado").header("Authorization", bearer("admin"))
+                .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.validationErrors.estado").exists());
+        mvc.perform(patch("/api/v1/usuarios/999999/estado").header("Authorization", bearer("admin"))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"estado\":false}"))
+                .andExpect(status().isNotFound());
+    }
     private static final String HASH = new BCryptPasswordEncoder().encode("Password2026*");
     @Autowired MockMvc mvc;
     @Autowired UsuarioRepository usuarios;

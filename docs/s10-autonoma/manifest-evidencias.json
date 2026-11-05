@@ -1,0 +1,922 @@
+[
+  {
+    "numero": 1,
+    "caso": "A-01",
+    "titulo": "Login de administrador",
+    "descripcion": "200; ADMIN y sus permisos.",
+    "archivo": "A-01_001.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084228.png",
+    "creado": "2026-10-18T08:42:28.967724-05:00",
+    "sha256": "7416358d380037b7d060ba42d680be53ab00a28bdf70e7af7fd3a67e0e1c2b52"
+  },
+  {
+    "numero": 2,
+    "caso": "A-01",
+    "titulo": "Login de vendedor",
+    "descripcion": "200; VENDEDOR y permisos comerciales.",
+    "archivo": "A-01_002.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084254.png",
+    "creado": "2026-10-18T08:42:54.114608-05:00",
+    "sha256": "92d86803b17277a43c858a3ac72c8a659212bbfe622abf103fb1937635d51c2e"
+  },
+  {
+    "numero": 3,
+    "caso": "A-01",
+    "titulo": "Preparación del login de supervisor",
+    "descripcion": "Solicitud preparada para comprobar la unión de roles.",
+    "archivo": "A-01_003.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084304.png",
+    "creado": "2026-10-18T08:43:04.338598-05:00",
+    "sha256": "ee131cd8d4b2da918479c82e922dab40db6902e57fc02d62097b97ee14155bc8"
+  },
+  {
+    "numero": 4,
+    "caso": "A-01",
+    "titulo": "Login de supervisor",
+    "descripcion": "200; ALMACENERO y VENDEDOR con la unión de permisos.",
+    "archivo": "A-01_004.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084309.png",
+    "creado": "2026-10-18T08:43:09.233061-05:00",
+    "sha256": "e4ab5cb46c916eba446da910196d10c07ba034a31916f9dacb71f2952a5b5742"
+  },
+  {
+    "numero": 5,
+    "caso": "AUX",
+    "titulo": "Perfil del administrador",
+    "descripcion": "200; perfil actual y permisos administrativos.",
+    "archivo": "AUX_005.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084328.png",
+    "creado": "2026-10-18T08:43:28.097234-05:00",
+    "sha256": "3a0036722b13b071e6595fa4b7c94ea9119e7a72292c7a8df5a32ccf0889c73b"
+  },
+  {
+    "numero": 6,
+    "caso": "A-02",
+    "titulo": "Usuario inexistente",
+    "descripcion": "401; Usuario o contraseña incorrectos.",
+    "archivo": "A-02_006.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084339.png",
+    "creado": "2026-10-18T08:43:39.896979-05:00",
+    "sha256": "0ef3f82bafa1abe01a4eae79fe670e6bc02fe219ffc340515d3f00679612063e"
+  },
+  {
+    "numero": 7,
+    "caso": "A-03",
+    "titulo": "Cuenta inactiva",
+    "descripcion": "401; el mensaje no revela la existencia de la cuenta.",
+    "archivo": "A-03_007.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084359.png",
+    "creado": "2026-10-18T08:43:59.468797-05:00",
+    "sha256": "06e221787e1cfa447ff31f436c0153bba03c08c2cc777ec8fd621349caffc72f"
+  },
+  {
+    "numero": 8,
+    "caso": "A-05",
+    "titulo": "Username con espacios exteriores",
+    "descripcion": "200; el login normaliza los espacios del username.",
+    "archivo": "A-05_008.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084421.png",
+    "creado": "2026-10-18T08:44:21.548446-05:00",
+    "sha256": "b3f5cb4a94d9cbdccc8e8afadeb0b308c51c05cf96c0e3c2ca1a9be5ed9e8a98"
+  },
+  {
+    "numero": 9,
+    "caso": "T-01",
+    "titulo": "Token sin prefijo Bearer",
+    "descripcion": "401; Debe iniciar sesión para acceder a este recurso.",
+    "archivo": "T-01_009.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084605.png",
+    "creado": "2026-10-18T08:46:05.788306-05:00",
+    "sha256": "30b928a2535786448baeaf5b1a0fc977f6700d3ca9a429983e333db4b598d4d3"
+  },
+  {
+    "numero": 10,
+    "caso": "T-02",
+    "titulo": "Payload alterado",
+    "descripcion": "401; El token no es válido.",
+    "archivo": "T-02_010.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084722.png",
+    "creado": "2026-10-18T08:47:22.862958-05:00",
+    "sha256": "102f48ec14cb1d1e1af5b229eb47ff59d42e29f270a601c77a6fa09f0e42d888"
+  },
+  {
+    "numero": 11,
+    "caso": "T-02",
+    "titulo": "Payload alterado: repetición",
+    "descripcion": "Se confirma el mismo rechazo 401 con el token alterado.",
+    "archivo": "T-02_011.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084729.png",
+    "creado": "2026-10-18T08:47:29.142749-05:00",
+    "sha256": "733acf84ea8223d70f8ec1cccf80be4fe4ecc30e3416337e346ee613cecde7d0"
+  },
+  {
+    "numero": 12,
+    "caso": "T-03",
+    "titulo": "Acceso con el secreto original",
+    "descripcion": "200 antes de cambiar la clave de firma.",
+    "archivo": "T-03_012.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 084752.png",
+    "creado": "2026-10-18T08:47:52.238798-05:00",
+    "sha256": "cc9d580d1cf360b9396a9073c4db7c361626c475118f0ce6fb36a5e8fde4c526"
+  },
+  {
+    "numero": 13,
+    "caso": "T-03",
+    "titulo": "Token anterior con otro secreto",
+    "descripcion": "401; El token no es válido después del cambio de secreto.",
+    "archivo": "T-03_013.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085153.png",
+    "creado": "2026-10-18T08:51:53.157420-05:00",
+    "sha256": "bca04d11ea116c76c011b4dc30771d62bb0ff26e5bc489fc3227c8fd2f259fd1"
+  },
+  {
+    "numero": 14,
+    "caso": "T-04",
+    "titulo": "Emisión de token corto",
+    "descripcion": "200; expiraEnSegundos igual a 60.",
+    "archivo": "T-04_014.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085251.png",
+    "creado": "2026-10-18T08:52:52.024391-05:00",
+    "sha256": "7fbd9a367a6acd6fd22ebd5670cd5b701e3f7cb70b5263001a4332320d5945ee"
+  },
+  {
+    "numero": 15,
+    "caso": "T-04",
+    "titulo": "Acceso antes del vencimiento",
+    "descripcion": "200 con el token de un minuto todavía vigente.",
+    "archivo": "T-04_015.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085302.png",
+    "creado": "2026-10-18T08:53:02.537178-05:00",
+    "sha256": "cc46424d073c37eba9db7f07c44c4d1fc84a7cb81eaa6dc8511851b832b84dd1"
+  },
+  {
+    "numero": 16,
+    "caso": "T-04",
+    "titulo": "Acceso después del vencimiento",
+    "descripcion": "401; El token ha expirado. Inicie sesión nuevamente.",
+    "archivo": "T-04_016.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085403.png",
+    "creado": "2026-10-18T08:54:03.867059-05:00",
+    "sha256": "895bfe101d75803e0f1aa6920c06c8000b04a871d366105cef2494d35e32121d"
+  },
+  {
+    "numero": 17,
+    "caso": "T-05",
+    "titulo": "Claims del JWT decodificados localmente",
+    "descripcion": "sub vendedor, authorities, iat y exp; en esta emisión corta, exp - iat = 60 segundos.",
+    "archivo": "T-05_017.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085642.png",
+    "creado": "2026-10-18T08:56:42.366059-05:00",
+    "sha256": "f907102c4472c56abbf5b459bce2e4425732be266fb95d69324694fafee6d4a8"
+  },
+  {
+    "numero": 18,
+    "caso": "T-06",
+    "titulo": "JWT malformado",
+    "descripcion": "401; El token no es válido con abc.def.ghi.",
+    "archivo": "T-06_018.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085723.png",
+    "creado": "2026-10-18T08:57:23.341007-05:00",
+    "sha256": "ab582100ea8035347bb8eb0331815cfbdce5115a98d8c088cd18bf86a4ef9a3c"
+  },
+  {
+    "numero": 19,
+    "caso": "REST",
+    "titulo": "Renovación de administrador",
+    "descripcion": "200; autenticación después de restaurar la configuración normal.",
+    "archivo": "REST_019.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085810.png",
+    "creado": "2026-10-18T08:58:10.130411-05:00",
+    "sha256": "b501607e449a016320d52fee53c95e07da4728f052da15fb1e96fdd257ce939a"
+  },
+  {
+    "numero": 20,
+    "caso": "REST",
+    "titulo": "Renovación de vendedor",
+    "descripcion": "200; nueva credencial para los casos posteriores.",
+    "archivo": "REST_020.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085816.png",
+    "creado": "2026-10-18T08:58:16.833282-05:00",
+    "sha256": "62b7644ef352384b8ecfee95b868cd77e821fe3b0aa0c455f4d2420a53532ded"
+  },
+  {
+    "numero": 21,
+    "caso": "REST",
+    "titulo": "Renovación de almacén",
+    "descripcion": "200; ALMACENERO y permisos del catálogo.",
+    "archivo": "REST_021.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 085822.png",
+    "creado": "2026-10-18T08:58:22.603561-05:00",
+    "sha256": "3bbfa879cf9de52d07f6905d09f55a5ae6a585889ddd8672500bf546971a344e"
+  },
+  {
+    "numero": 22,
+    "caso": "P-01",
+    "titulo": "POST categorías como vendedor",
+    "descripcion": "403; No tiene permisos para realizar esta operación.",
+    "archivo": "P-01_022.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090154.png",
+    "creado": "2026-10-18T09:01:54.582745-05:00",
+    "sha256": "56915a03f721bb853f3c67ecec63d7ef42570b4ec3f76b4cbb24682fd3e5891c"
+  },
+  {
+    "numero": 23,
+    "caso": "P-01",
+    "titulo": "PUT categorías como vendedor",
+    "descripcion": "403; actualización rechazada por falta de permiso.",
+    "archivo": "P-01_023.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090211.png",
+    "creado": "2026-10-18T09:02:11.627606-05:00",
+    "sha256": "720b0d744b486125fcadee119fd1fbbd3e972b55de023a10db803e8bf149dd13"
+  },
+  {
+    "numero": 24,
+    "caso": "P-01",
+    "titulo": "DELETE categorías como vendedor",
+    "descripcion": "403; eliminación rechazada por falta de permiso.",
+    "archivo": "P-01_024.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090222.png",
+    "creado": "2026-10-18T09:02:22.934110-05:00",
+    "sha256": "87803893155119418542e80ae5d66ba3f82cee876bab77df17f37c9098a24bb5"
+  },
+  {
+    "numero": 25,
+    "caso": "P-01",
+    "titulo": "PUT categorías: comprobación adicional",
+    "descripcion": "403; se mantiene el rechazo al vendedor.",
+    "archivo": "P-01_025.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090232.png",
+    "creado": "2026-10-18T09:02:32.061254-05:00",
+    "sha256": "5bb63429dfe217e71da39d0f70ef2f34a79f4ee08db2e173132a7e967bb5e0d8"
+  },
+  {
+    "numero": 26,
+    "caso": "P-01",
+    "titulo": "DELETE categorías: comprobación adicional",
+    "descripcion": "403; se confirma la protección de la operación.",
+    "archivo": "P-01_026.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090239.png",
+    "creado": "2026-10-18T09:02:39.085060-05:00",
+    "sha256": "da4684b849b7c05ad8e5f0d174c26144b95f1583a4ab4d0dab102cb65a6ca9c9"
+  },
+  {
+    "numero": 27,
+    "caso": "P-02",
+    "titulo": "Lectura de clientes desde almacén",
+    "descripcion": "403; ALMACENERO no tiene CLIENTES_LEER.",
+    "archivo": "P-02_027.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090308.png",
+    "creado": "2026-10-18T09:03:08.613634-05:00",
+    "sha256": "f237eca8769a87e17c9aeb4dcb2b4a08e516f7b916a17ca565f19f061e8bed56"
+  },
+  {
+    "numero": 28,
+    "caso": "P-02",
+    "titulo": "Clientes desde almacén: repetición",
+    "descripcion": "403; se confirma el límite de permisos.",
+    "archivo": "P-02_028.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090316.png",
+    "creado": "2026-10-18T09:03:17.066161-05:00",
+    "sha256": "aa5c01ea04fc0796fe320adfbca389ca74112895fe56cbf100d46e5e05d8292c"
+  },
+  {
+    "numero": 29,
+    "caso": "P-02",
+    "titulo": "Venta desde almacén",
+    "descripcion": "403; no se autoriza registrar ventas.",
+    "archivo": "P-02_029.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090329.png",
+    "creado": "2026-10-18T09:03:29.664632-05:00",
+    "sha256": "ec65a0f37a7cf6a845069909eab8165336d9a919c81d4d863bffb3e070483f6e"
+  },
+  {
+    "numero": 30,
+    "caso": "P-03",
+    "titulo": "Reporte con cuenta de almacén",
+    "descripcion": "403; el reporte exige REPORTES_VER.",
+    "archivo": "P-03_030.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090344.png",
+    "creado": "2026-10-18T09:03:44.912034-05:00",
+    "sha256": "912c63ef6deb30e9de04982a5ce966ec2594c7a92b7e888f2888d9c544e2e09b"
+  },
+  {
+    "numero": 31,
+    "caso": "P-03",
+    "titulo": "Reporte con vendedor",
+    "descripcion": "403; rechazo de autorización del reporte.",
+    "archivo": "P-03_031.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090545.png",
+    "creado": "2026-10-18T09:05:45.215610-05:00",
+    "sha256": "e00c4c49bf0aa855cf1e0ddcc6ab10b79de29f093bed121a105c13a42359ff49"
+  },
+  {
+    "numero": 32,
+    "caso": "P-03",
+    "titulo": "Reporte con almacén: repetición",
+    "descripcion": "403; la cuenta autenticada carece de REPORTES_VER.",
+    "archivo": "P-03_032.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090558.png",
+    "creado": "2026-10-18T09:05:58.104677-05:00",
+    "sha256": "8f3674f226bbb91035efb54a93c38a86d85627b93f1ee27c009b3181d8403711"
+  },
+  {
+    "numero": 33,
+    "caso": "P-04",
+    "titulo": "Administrador consulta categorías",
+    "descripcion": "200; listado paginado del módulo.",
+    "archivo": "P-04_033.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090610.png",
+    "creado": "2026-10-18T09:06:10.148576-05:00",
+    "sha256": "1dc38be859c936baa5f1812c2c5c944a74e4aabf5f24920322e05343e0d6affb"
+  },
+  {
+    "numero": 34,
+    "caso": "P-04",
+    "titulo": "Administrador consulta productos",
+    "descripcion": "200; listado del catálogo.",
+    "archivo": "P-04_034.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090621.png",
+    "creado": "2026-10-18T09:06:21.482369-05:00",
+    "sha256": "1e060128e89dabc0dccdb303b5a9f21584b7ccb5d50788c48209d1b8402e3726"
+  },
+  {
+    "numero": 35,
+    "caso": "P-04",
+    "titulo": "Administrador consulta clientes",
+    "descripcion": "200; acceso al módulo de clientes.",
+    "archivo": "P-04_035.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090635.png",
+    "creado": "2026-10-18T09:06:35.313466-05:00",
+    "sha256": "8052cf67e7f98bd3a5507c7bc7bb395ac592bc5f81339eb9c075cfebcd0d9179"
+  },
+  {
+    "numero": 36,
+    "caso": "P-04",
+    "titulo": "Administrador consulta ventas",
+    "descripcion": "200; acceso al historial de ventas.",
+    "archivo": "P-04_036.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090652.png",
+    "creado": "2026-10-18T09:06:52.871942-05:00",
+    "sha256": "43179a5edf53f152174be3879bf592772befc6d933d95913ea6a5f1a74e2f332"
+  },
+  {
+    "numero": 37,
+    "caso": "P-04",
+    "titulo": "Administrador consulta reportes",
+    "descripcion": "200; reporte de ventas por categoría.",
+    "archivo": "P-04_037.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090722.png",
+    "creado": "2026-10-18T09:07:22.599621-05:00",
+    "sha256": "a8b3309f0588597ae211c6aff58f95eb18677387e8d29bc12a98a12a7a75ae3c"
+  },
+  {
+    "numero": 38,
+    "caso": "P-04",
+    "titulo": "Administrador consulta usuarios",
+    "descripcion": "200; perfiles sin campo password.",
+    "archivo": "P-04_038.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090735.png",
+    "creado": "2026-10-18T09:07:36.041689-05:00",
+    "sha256": "7640970190063c98e6eea5b2179332080af0c7dce784258b19517dd22b296051"
+  },
+  {
+    "numero": 39,
+    "caso": "P-04",
+    "titulo": "Administrador consulta empleados",
+    "descripcion": "200; datos y disponibilidad de cuentas.",
+    "archivo": "P-04_039.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090748.png",
+    "creado": "2026-10-18T09:07:48.963321-05:00",
+    "sha256": "bdaf2ad20fcb995161433940a6dfef34c6949ae7ea3f0cf6ad5cf9f2a30f8988"
+  },
+  {
+    "numero": 40,
+    "caso": "P-04",
+    "titulo": "Administrador consulta roles",
+    "descripcion": "200; roles y permisos disponibles.",
+    "archivo": "P-04_040.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090805.png",
+    "creado": "2026-10-18T09:08:05.443274-05:00",
+    "sha256": "214151e8d7cfc7b350845d20575f1f0841bacb470891c68f2ad7c4db73377492"
+  },
+  {
+    "numero": 41,
+    "caso": "P-05",
+    "titulo": "Vendedor intenta crear usuarios",
+    "descripcion": "403; solo el permiso administrativo autoriza el alta.",
+    "archivo": "P-05_041.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090821.png",
+    "creado": "2026-10-18T09:08:21.484017-05:00",
+    "sha256": "b3ba4093b60062fa1f877af463d598a7ea5272b2424c40a2a737d19792fcf38a"
+  },
+  {
+    "numero": 42,
+    "caso": "U-01",
+    "titulo": "Contraseña sin números",
+    "descripcion": "400; validationErrors.password informa la regla de letra y número.",
+    "archivo": "U-01_042.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090928.png",
+    "creado": "2026-10-18T09:09:28.423207-05:00",
+    "sha256": "4065ad9abafef9d7576a7cdf6fd6ff9f3abf39e16211be68d3faa79c3b348354"
+  },
+  {
+    "numero": 43,
+    "caso": "U-01",
+    "titulo": "Alta sin roles",
+    "descripcion": "400; validationErrors.rolIds exige al menos un rol.",
+    "archivo": "U-01_043.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090941.png",
+    "creado": "2026-10-18T09:09:41.319708-05:00",
+    "sha256": "a4896f3c8b510857394696789ccea5fd16130e3547b842b6b2e9225d6f87e363"
+  },
+  {
+    "numero": 44,
+    "caso": "U-03",
+    "titulo": "Contraseña multibyte extensa",
+    "descripcion": "409; La contraseña no puede superar 72 bytes.",
+    "archivo": "U-03_044.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 090955.png",
+    "creado": "2026-10-18T09:09:55.544042-05:00",
+    "sha256": "55826807d77bd8e69569d83c5c737bd572577e7344a9ad5cc1ce0faed2c8a37c"
+  },
+  {
+    "numero": 45,
+    "caso": "U-02",
+    "titulo": "Empleado con cuenta existente",
+    "descripcion": "409; se protege la relación uno a uno entre empleado y usuario.",
+    "archivo": "U-02_045.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091009.png",
+    "creado": "2026-10-18T09:10:09.809275-05:00",
+    "sha256": "c2536432ce3e601bbd33c76fa0a1aacc2e5cacbee0bab69db9ee89522667dcc3"
+  },
+  {
+    "numero": 46,
+    "caso": "U-02",
+    "titulo": "Creación de la cuenta de prueba",
+    "descripcion": "201; autonoma_s10, usuario 22, empleado 21, VENDEDOR, sin password en la respuesta.",
+    "archivo": "U-02_046.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091021.png",
+    "creado": "2026-10-18T09:10:21.480170-05:00",
+    "sha256": "5333cc8524c5e1dd7c14133bd35e20f23c7b77a8c143f51f9aaf069c1f70c36f"
+  },
+  {
+    "numero": 47,
+    "caso": "AUX",
+    "titulo": "Login de la cuenta de prueba",
+    "descripcion": "200; token de autonoma_s10 para las operaciones de la parte B.",
+    "archivo": "AUX_047.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091033.png",
+    "creado": "2026-10-18T09:10:33.088833-05:00",
+    "sha256": "d87f08aa1b901e6ab8d2db7336ab7bf553f48a1e5c43af629428c50c9b975045"
+  },
+  {
+    "numero": 48,
+    "caso": "B-01",
+    "titulo": "Contraseña actual incorrecta",
+    "descripcion": "409; La contraseña actual no es correcta.",
+    "archivo": "B-01_048.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091108.png",
+    "creado": "2026-10-18T09:11:08.114873-05:00",
+    "sha256": "5433496d6ef22b76069c7ec4e7592808dbec6e1c8d0a60766bd1ff230320d0df"
+  },
+  {
+    "numero": 49,
+    "caso": "B-02",
+    "titulo": "Nueva contraseña igual a la actual",
+    "descripcion": "409; La nueva contraseña debe ser distinta de la actual.",
+    "archivo": "B-02_049.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091123.png",
+    "creado": "2026-10-18T09:11:23.097023-05:00",
+    "sha256": "e187a5015fbf6caa6bf75ac30cd0392526c48659760bb3bc50f61508847593d4"
+  },
+  {
+    "numero": 50,
+    "caso": "B-03",
+    "titulo": "Nueva contraseña vacía",
+    "descripcion": "400; validación de passwordNueva.",
+    "archivo": "B-03_050.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091135.png",
+    "creado": "2026-10-18T09:11:35.063011-05:00",
+    "sha256": "140198926fd7b8ea6e466d7ae87ee54042524e02539ff14bf9ff249a2b82371c"
+  },
+  {
+    "numero": 51,
+    "caso": "B-03",
+    "titulo": "Nueva contraseña corta",
+    "descripcion": "400; tamaño mínimo y reglas de complejidad.",
+    "archivo": "B-03_051.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091145.png",
+    "creado": "2026-10-18T09:11:45.883958-05:00",
+    "sha256": "1e19df2b28ef3b9f15357d76e58d8cc90d7ef93791780441caf443f7695db14a"
+  },
+  {
+    "numero": 52,
+    "caso": "B-03",
+    "titulo": "Nueva contraseña sin números",
+    "descripcion": "400; debe incluir al menos una letra y un número.",
+    "archivo": "B-03_052.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091156.png",
+    "creado": "2026-10-18T09:11:56.389932-05:00",
+    "sha256": "b5e1eaa3be912e369eb563216132631bd327393e2414f97149bdc39c916176c6"
+  },
+  {
+    "numero": 53,
+    "caso": "B-03",
+    "titulo": "Nueva contraseña sin letras",
+    "descripcion": "400; debe incluir al menos una letra y un número.",
+    "archivo": "B-03_053.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091205.png",
+    "creado": "2026-10-18T09:12:05.506384-05:00",
+    "sha256": "993c563dbd7f8c9057b097f46c78d51b939ed504241aa2e67a2a25ee9ca07769"
+  },
+  {
+    "numero": 54,
+    "caso": "B-03",
+    "titulo": "Nueva contraseña excede 72 bytes",
+    "descripcion": "409; se aplica el límite de entrada de BCrypt en UTF-8.",
+    "archivo": "B-03_054.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091223.png",
+    "creado": "2026-10-18T09:12:23.450545-05:00",
+    "sha256": "1cbf2c46b63e1a2b2ab4633d953a51058dba97873a6787d2fc7f0c95ef8482e2"
+  },
+  {
+    "numero": 55,
+    "caso": "B-04",
+    "titulo": "Cambio de contraseña válido",
+    "descripcion": "204 No Content; operación sobre la identidad autenticada.",
+    "archivo": "B-04_055.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091301.png",
+    "creado": "2026-10-18T09:13:01.056793-05:00",
+    "sha256": "252e8be0b2696c2eb8e255be51abff5c362626067ff08cc4697163711c49efb1"
+  },
+  {
+    "numero": 56,
+    "caso": "B-04",
+    "titulo": "Login con la contraseña anterior",
+    "descripcion": "401; la contraseña anterior deja de autenticar.",
+    "archivo": "B-04_056.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091311.png",
+    "creado": "2026-10-18T09:13:11.368199-05:00",
+    "sha256": "da175ec23be69190c46834251323fc1c1bdef83060be190b201d0d5fecc3b752"
+  },
+  {
+    "numero": 57,
+    "caso": "B-04",
+    "titulo": "Login con la contraseña nueva",
+    "descripcion": "200; la nueva contraseña autentica correctamente.",
+    "archivo": "B-04_057.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091321.png",
+    "creado": "2026-10-18T09:13:21.511269-05:00",
+    "sha256": "afd4cbf2f04d3e44e4a440987b1e3c7ecac3ab30f003b10109f379c672c85017"
+  },
+  {
+    "numero": 58,
+    "caso": "B-04",
+    "titulo": "JWT anterior al cambio sigue válido",
+    "descripcion": "200 en auth/me con el token emitido antes del cambio.",
+    "archivo": "B-04_058.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091339.png",
+    "creado": "2026-10-18T09:13:39.082114-05:00",
+    "sha256": "4c87633bc3a0ad8dfb6cb80e8905d14ffd35a17c755b31680a582bd533249bfd"
+  },
+  {
+    "numero": 59,
+    "caso": "REST",
+    "titulo": "Restauración de contraseña",
+    "descripcion": "204; se restablece la contraseña inicial de la cuenta de prueba.",
+    "archivo": "REST_059.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 091352.png",
+    "creado": "2026-10-18T09:13:53.038169-05:00",
+    "sha256": "a818b9cd9741dbc48eb585f616f380956c0f55f31266757fa59e93b1bccf540c"
+  },
+  {
+    "numero": 60,
+    "caso": "PREP",
+    "titulo": "Preparación del entorno del navegador",
+    "descripcion": "Intento inicial con localhost sin el frontend iniciado; se repite correctamente desde la SPA en C-01.",
+    "archivo": "PREP_060.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 092158.png",
+    "creado": "2026-10-18T09:21:58.329999-05:00",
+    "sha256": "d1491bf37bab3f16e18575e67c860a7e958838b795e44e61ae03496a0f8a984e"
+  },
+  {
+    "numero": 61,
+    "caso": "B-05",
+    "titulo": "Sin permiso de edición antes del cambio",
+    "descripcion": "403; la cuenta VENDEDOR no puede editar productos.",
+    "archivo": "B-05_061.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095550.png",
+    "creado": "2026-10-18T09:55:50.790787-05:00",
+    "sha256": "15c66e5ea178dfdca3909f479ee31c7db2962e53209a12767408a395c7111698"
+  },
+  {
+    "numero": 62,
+    "caso": "B-05",
+    "titulo": "Asignación de dos roles",
+    "descripcion": "200; respuesta con ALMACENERO y VENDEDOR y sus permisos.",
+    "archivo": "B-05_062.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095606.png",
+    "creado": "2026-10-18T09:56:06.232176-05:00",
+    "sha256": "7f2e248cf35a402334cf77599b4681896bbc2667c666bde7198df448fe6e82a4"
+  },
+  {
+    "numero": 63,
+    "caso": "B-05",
+    "titulo": "Edición con el mismo token",
+    "descripcion": "200; el permiso nuevo se aplica sin un nuevo login.",
+    "archivo": "B-05_063.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095627.png",
+    "creado": "2026-10-18T09:56:27.394206-05:00",
+    "sha256": "6924685553c5938c86a868176350296df7d6ac21794c730bdba96cc9ba38bd54"
+  },
+  {
+    "numero": 64,
+    "caso": "B-05",
+    "titulo": "Reemplazo por solo almacén",
+    "descripcion": "200; el conjunto de roles queda únicamente en ALMACENERO.",
+    "archivo": "B-05_064.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095644.png",
+    "creado": "2026-10-18T09:56:44.447283-05:00",
+    "sha256": "f1d2265d1a46c6346e7f113de0a050d4a93046def7bc432d7aacac995d539aac"
+  },
+  {
+    "numero": 65,
+    "caso": "B-05",
+    "titulo": "Pérdida de lectura de clientes",
+    "descripcion": "403 con el mismo token tras retirar VENDEDOR.",
+    "archivo": "B-05_065.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095657.png",
+    "creado": "2026-10-18T09:56:57.504696-05:00",
+    "sha256": "59d6c26798f2053b8648d82979259f00b830d591839ac7dd695ebd29fc1f9ebc"
+  },
+  {
+    "numero": 66,
+    "caso": "REST",
+    "titulo": "Restauración de VENDEDOR",
+    "descripcion": "200; se restablece el rol inicial de la cuenta de prueba.",
+    "archivo": "REST_066.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095716.png",
+    "creado": "2026-10-18T09:57:16.324932-05:00",
+    "sha256": "f3ba3e65263e60db8f68bc67bdc210dc5927685bb7e5fc8829ed9b4401beca3f"
+  },
+  {
+    "numero": 67,
+    "caso": "B-06",
+    "titulo": "Conjunto de roles vacío",
+    "descripcion": "400; rolIds debe contener al menos un rol.",
+    "archivo": "B-06_067.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095729.png",
+    "creado": "2026-10-18T09:57:29.332640-05:00",
+    "sha256": "0be9fa2f03bd377f3c1d7ed08aa96d07c4212a577c09caf9082a3c8751d7cabe"
+  },
+  {
+    "numero": 68,
+    "caso": "B-06",
+    "titulo": "Elemento nulo en roles",
+    "descripcion": "400; validación del elemento de rolIds.",
+    "archivo": "B-06_068.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095743.png",
+    "creado": "2026-10-18T09:57:43.435574-05:00",
+    "sha256": "5d130f051a74cd33b52d0b92f5bd00cba1c74c83ee9aedf506d35f6e344ea394"
+  },
+  {
+    "numero": 69,
+    "caso": "B-06",
+    "titulo": "Rol inexistente",
+    "descripcion": "404; Roles no encontrados: [999999].",
+    "archivo": "B-06_069.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095756.png",
+    "creado": "2026-10-18T09:57:56.115925-05:00",
+    "sha256": "c7091cd525c0ca305b0c5ddf8555d5cee511c01faf0d64893422f63ae86f4b05"
+  },
+  {
+    "numero": 70,
+    "caso": "B-06",
+    "titulo": "Usuario inexistente al asignar roles",
+    "descripcion": "404; Usuario no encontrado con id: 999999.",
+    "archivo": "B-06_070.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095808.png",
+    "creado": "2026-10-18T09:58:08.456276-05:00",
+    "sha256": "86db594ccf35b930ffe9adf6408b5d2cc37ef73c9d1292681923dcb4cbb4efc8"
+  },
+  {
+    "numero": 71,
+    "caso": "B-07",
+    "titulo": "Administrador intenta quitarse ADMIN",
+    "descripcion": "409; No puede quitarse a sí mismo el rol ADMIN.",
+    "archivo": "B-07_071.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095843.png",
+    "creado": "2026-10-18T09:58:43.440947-05:00",
+    "sha256": "87b0e9cb014179c7d228e0466811de1203da78742e1cd62c516afe7170ccae23"
+  },
+  {
+    "numero": 72,
+    "caso": "B-07",
+    "titulo": "Autoeliminación de ADMIN: autorización",
+    "descripcion": "Vista del token administrador y el mismo rechazo 409.",
+    "archivo": "B-07_072.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095902.png",
+    "creado": "2026-10-18T09:59:02.081432-05:00",
+    "sha256": "ace613946e50f937578cf71067bbbb515c4c888dbf4501ddd6c3a31b717b0145"
+  },
+  {
+    "numero": 73,
+    "caso": "B-07",
+    "titulo": "Administrador intenta autodesactivarse",
+    "descripcion": "409; No puede desactivarse a sí mismo.",
+    "archivo": "B-07_073.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095918.png",
+    "creado": "2026-10-18T09:59:18.422633-05:00",
+    "sha256": "57eecdc2b9936c6be2e77724ba5c64ee4a0fc02b73c1bdb5ed8780a3b21b171c"
+  },
+  {
+    "numero": 74,
+    "caso": "B-07",
+    "titulo": "Autodesactivación: autorización",
+    "descripcion": "Vista del token administrador y el rechazo 409.",
+    "archivo": "B-07_074.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095927.png",
+    "creado": "2026-10-18T09:59:27.736987-05:00",
+    "sha256": "9ae91ac29de7b98ee9e9b2c83cd1e5bcd613fb3fd42169830b166c934d95f375"
+  },
+  {
+    "numero": 75,
+    "caso": "B-07",
+    "titulo": "No administrador intenta cambiar roles",
+    "descripcion": "403; falta USUARIOS_ADMINISTRAR.",
+    "archivo": "B-07_075.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095943.png",
+    "creado": "2026-10-18T09:59:43.456910-05:00",
+    "sha256": "237883c237675b2b5158ecb097de794fc4371ce70656d79b14e5443af6f11316"
+  },
+  {
+    "numero": 76,
+    "caso": "B-07",
+    "titulo": "Cambio de roles no autorizado: token",
+    "descripcion": "Se confirma 403 con el token de la cuenta de prueba.",
+    "archivo": "B-07_076.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 095950.png",
+    "creado": "2026-10-18T09:59:50.187404-05:00",
+    "sha256": "0b41fa84d117d2f3244e7605ddd83a78eb3fb45f2ec0b9c25a707775e4eb2b51"
+  },
+  {
+    "numero": 77,
+    "caso": "B-07",
+    "titulo": "No administrador intenta cambiar estado",
+    "descripcion": "403; falta USUARIOS_ADMINISTRAR.",
+    "archivo": "B-07_077.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 100004.png",
+    "creado": "2026-10-18T10:00:04.152468-05:00",
+    "sha256": "b7fa34c74182df4a76f10e1f0b85eba1b1aecf9cbe4c7e69c90fd72d932d2dcd"
+  },
+  {
+    "numero": 78,
+    "caso": "B-07",
+    "titulo": "Cambio de estado no autorizado: token",
+    "descripcion": "Se confirma el rechazo 403 a la cuenta no administradora.",
+    "archivo": "B-07_078.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 100014.png",
+    "creado": "2026-10-18T10:00:14.066892-05:00",
+    "sha256": "4df02d630238fedcca3626184a587db87a65dbffaf2883c01a23cd1cccc3f91f"
+  },
+  {
+    "numero": 79,
+    "caso": "B-08",
+    "titulo": "Token previo a desactivar",
+    "descripcion": "200; login y emisión del token que se conserva durante la prueba.",
+    "archivo": "B-08_079.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101604.png",
+    "creado": "2026-10-18T10:16:04.401944-05:00",
+    "sha256": "51693d2dd1a2c2c028e5069124030e3dfe45247d7610b0d7dcd3050307e4ef3d"
+  },
+  {
+    "numero": 80,
+    "caso": "B-08",
+    "titulo": "Desactivación de la cuenta",
+    "descripcion": "200; estado false en el perfil de autonoma_s10.",
+    "archivo": "B-08_080.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101616.png",
+    "creado": "2026-10-18T10:16:16.956203-05:00",
+    "sha256": "849c22c31cfdd3241c91e4abb967c9cdf293da9e03b7416228b929c4791933ec"
+  },
+  {
+    "numero": 81,
+    "caso": "B-08",
+    "titulo": "Acceso con token de cuenta desactivada",
+    "descripcion": "401; El usuario está deshabilitado.",
+    "archivo": "B-08_081.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101628.png",
+    "creado": "2026-10-18T10:16:28.281248-05:00",
+    "sha256": "70530a81e36b25a351c0b75234e15f77db878256793816bb54e7fd2238b33ed0"
+  },
+  {
+    "numero": 82,
+    "caso": "B-08",
+    "titulo": "Login de cuenta desactivada",
+    "descripcion": "401; Usuario o contraseña incorrectos.",
+    "archivo": "B-08_082.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101638.png",
+    "creado": "2026-10-18T10:16:38.092380-05:00",
+    "sha256": "cff19bca1558921529967cc24ca3324fb67fcc645ba1294c583f761b22ac643a"
+  },
+  {
+    "numero": 83,
+    "caso": "B-08",
+    "titulo": "Reactivación de la cuenta",
+    "descripcion": "200; estado true.",
+    "archivo": "B-08_083.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101647.png",
+    "creado": "2026-10-18T10:16:47.418959-05:00",
+    "sha256": "3c6d2e7d10fe424d22365e5bbdda0dd6a607e526ae36c124bf362c828f10a9e4"
+  },
+  {
+    "numero": 84,
+    "caso": "B-08",
+    "titulo": "Token previo después de reactivar",
+    "descripcion": "200; vuelve a funcionar mientras conserva firma y vigencia.",
+    "archivo": "B-08_084.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101656.png",
+    "creado": "2026-10-18T10:16:56.331247-05:00",
+    "sha256": "44ff7d7e0a2648941cc4345ee855fdc7749af89b0a1348a8bcedcd298608ca90"
+  },
+  {
+    "numero": 85,
+    "caso": "B-08",
+    "titulo": "Login después de reactivar",
+    "descripcion": "200; autenticación nuevamente permitida.",
+    "archivo": "B-08_085.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101705.png",
+    "creado": "2026-10-18T10:17:05.971213-05:00",
+    "sha256": "56144100f849226a04714e64ed089775d56865d6b23aa45dd1797af559077799"
+  },
+  {
+    "numero": 86,
+    "caso": "B-08",
+    "titulo": "Estado de un usuario inexistente",
+    "descripcion": "404; Usuario no encontrado con id: 999999.",
+    "archivo": "B-08_086.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101714.png",
+    "creado": "2026-10-18T10:17:14.884865-05:00",
+    "sha256": "aacfbbbce1fa5da8ceb534cac414262ee02b09a7fd99549e652fae8185c31e83"
+  },
+  {
+    "numero": 87,
+    "caso": "B-08",
+    "titulo": "Estado nulo",
+    "descripcion": "400; validationErrors.estado indica que el estado es obligatorio.",
+    "archivo": "B-08_087.png",
+    "original": "C:\\Users\\DRIZA\\Documents\\UNI\\Evidence\\Captura de pantalla 2026-10-18 101723.png",
+    "creado": "2026-10-18T10:17:23.675071-05:00",
+    "sha256": "c874f6299686023309e0700c657ae0a776ce6efdf0afddfb30242a067304dd86"
+  },
+  {
+    "numero": 88,
+    "caso": "C-01",
+    "titulo": "Consulta desde la SPA",
+    "descripcion": "Consola de localhost:4200: HTTP 200 y JSON de productos.",
+    "archivo": "C-01_088.png",
+    "original": "C:\\Users\\DRIZA\\OneDrive\\Imágenes\\Capturas de pantalla\\Captura de pantalla 2026-10-18 102548.png",
+    "creado": "2026-10-18T10:25:48.474315-05:00",
+    "sha256": "883157291049e7256a19e68545d0c59d421b7d70477cf35a63049d4c5503abd9"
+  },
+  {
+    "numero": 89,
+    "caso": "C-01",
+    "titulo": "GET autorizado por CORS",
+    "descripcion": "GET 200; Access-Control-Allow-Origin igual a http://localhost:4200.",
+    "archivo": "C-01_089.png",
+    "original": "C:\\Users\\DRIZA\\OneDrive\\Imágenes\\Capturas de pantalla\\Captura de pantalla 2026-10-18 102554.png",
+    "creado": "2026-10-18T10:25:54.226542-05:00",
+    "sha256": "72dc481f8ddd4fd85872abd18a7545f305cfbf35ce787f386c3fc5314f4f2f81"
+  },
+  {
+    "numero": 90,
+    "caso": "C-01",
+    "titulo": "Respuesta JSON accesible",
+    "descripcion": "El navegador muestra el contenido de productos en Response.",
+    "archivo": "C-01_090.png",
+    "original": "C:\\Users\\DRIZA\\OneDrive\\Imágenes\\Capturas de pantalla\\Captura de pantalla 2026-10-18 102606.png",
+    "creado": "2026-10-18T10:26:06.509744-05:00",
+    "sha256": "ba4db1386f6f76052415e484ac55af5d349a567e3198454556871f8ca5484b85"
+  },
+  {
+    "numero": 91,
+    "caso": "C-01",
+    "titulo": "Preflight OPTIONS",
+    "descripcion": "OPTIONS 200; origen localhost:4200, authorization permitido y métodos autorizados.",
+    "archivo": "C-01_091.png",
+    "original": "C:\\Users\\DRIZA\\OneDrive\\Imágenes\\Capturas de pantalla\\Captura de pantalla 2026-10-18 102627.png",
+    "creado": "2026-10-18T10:26:27.092931-05:00",
+    "sha256": "48066948b1633890d2934abee51bfa59165c948b0ebbb5289815782293a64237"
+  },
+  {
+    "numero": 92,
+    "caso": "C-01",
+    "titulo": "Cabeceras completas del preflight",
+    "descripcion": "HTTP 200; Allow-Origin, Allow-Methods, Allow-Headers y Max-Age en vista Raw.",
+    "archivo": "C-01_092.png",
+    "original": "C:\\Users\\DRIZA\\OneDrive\\Imágenes\\Capturas de pantalla\\Captura de pantalla 2026-10-18 102635.png",
+    "creado": "2026-10-18T10:26:35.833154-05:00",
+    "sha256": "a2b5df868214cab6ff4cd88448a463259aedeae0661dc1f9ae2307203eeb0157"
+  }
+]

@@ -1,5 +1,7 @@
 package com.edu.upeu.PharmaBackend.service.impl;
 
+import java.util.TreeSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -127,6 +129,44 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .stream()
                 .map(usuarioMapper::toUsuarioResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public UsuarioResponseDTO asignarRoles(Long id, Set<Long> rolIds, String usuarioActual) {
+        Usuario usuario = buscarUsuario(id);
+        List<Rol> roles = rolRepository.findAllById(rolIds);
+        if (roles.size() != rolIds.size()) {
+            Set<Long> faltantes = new TreeSet<>(rolIds);
+            roles.forEach(rol -> faltantes.remove(rol.getId()));
+            throw new RecursosNoEncontradosException("Roles no encontrados: " + faltantes);
+        }
+        if (usuario.getUsername().equalsIgnoreCase(usuarioActual)
+                && roles.stream().noneMatch(rol -> "ADMIN".equals(rol.getNombre()))) {
+            throw new ReglaNegocioException("No puede quitarse a sí mismo el rol ADMIN");
+        }
+        usuario.setRoles(new HashSet<>(roles));
+        usuarioRepository.save(usuario);
+        log.info("Roles actualizados: usuario={} por={}", usuario.getUsername(), usuarioActual);
+        return usuarioMapper.toUsuarioResponse(usuario);
+    }
+
+    @Override
+    @Transactional
+    public UsuarioResponseDTO cambiarEstado(Long id, boolean estado, String usuarioActual) {
+        Usuario usuario = buscarUsuario(id);
+        if (!estado && usuario.getUsername().equalsIgnoreCase(usuarioActual)) {
+            throw new ReglaNegocioException("No puede desactivarse a sí mismo");
+        }
+        usuario.setEstado(estado);
+        usuarioRepository.save(usuario);
+        log.info("Estado actualizado: usuario={} activo={} por={}", usuario.getUsername(), estado, usuarioActual);
+        return usuarioMapper.toUsuarioResponse(usuario);
+    }
+
+    private Usuario buscarUsuario(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(() ->
+                new RecursosNoEncontradosException("Usuario no encontrado con id: " + id));
     }
 
     @Override
