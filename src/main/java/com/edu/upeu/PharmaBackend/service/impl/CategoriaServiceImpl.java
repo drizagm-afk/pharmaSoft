@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "categorias", allEntries = true)
     public CategoriaResponseDTO create(CategoriaRequestDTO request) {
         String nombre = request.getNombre().trim();
         request.setNombre(nombre);
@@ -44,6 +47,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = {"categorias", "productos"}, allEntries = true)
     public CategoriaResponseDTO update(Long id, CategoriaRequestDTO request) {
         request.setNombre(request.getNombre().trim());
 
@@ -60,6 +64,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "categorias", key = "'id-' + #p0")
     public CategoriaResponseDTO read(Long id) {
         var optCategoria = categoriaRepository.findById(id);
         if (optCategoria.isEmpty())
@@ -70,6 +75,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "categorias", allEntries = true)
     public void delete(Long id) {
         if (!categoriaRepository.existsById(id))
             throw new RecursosNoEncontradosException("Categoria no encontrada con id: " + id);
@@ -82,10 +88,16 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "categorias", key = "'todas'")
     public List<CategoriaResponseDTO> readAll() {
-        return categoriaRepository.findAll()
+        long inicio = System.currentTimeMillis();
+        logger.info("Inicio listar categorias");
+        var resultado = categoriaRepository.findAll()
                 .stream()
                 .map(CategoriaMapper::ConvertToResponse)
                 .toList();
+        logger.info("Fin listar categorias | filas={} | duracionMs={}", resultado.size(),
+                System.currentTimeMillis() - inicio);
+        return resultado;
     }
 }

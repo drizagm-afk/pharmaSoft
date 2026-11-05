@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +45,7 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public VentaResponseDTO create(VentaRequestDTO request) {
         Cliente cliente = clienteRepository.findById(request.getClienteId())
                 .orElseThrow(() -> new RecursosNoEncontradosException("Cliente no encontrado con id: " + request.getClienteId()));

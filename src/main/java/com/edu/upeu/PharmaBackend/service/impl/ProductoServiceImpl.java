@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 import com.edu.upeu.PharmaBackend.service.support.Paginacion;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public ProductoResponseDTO create(ProductoRequestDTO request) {
         String nombre = request.getNombre().trim();
         request.setNombre(nombre);
@@ -53,6 +56,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public ProductoResponseDTO update(Long id, ProductoRequestDTO request) {
         request.setNombre(request.getNombre().trim());
 
@@ -74,6 +78,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productos", key = "'id-' + #p0")
     public ProductoResponseDTO read(Long id) {
         var optProducto = productoRepository.findById(id);
         if (optProducto.isEmpty())
@@ -84,6 +89,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public void delete(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() ->
                 new RecursosNoEncontradosException("Producto no encontrado con id: " + id));
@@ -95,6 +101,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productos", key = "'todas'")
     public List<ProductoResponseDTO> readAll() {
         return productoRepository.findAll()
                 .stream()
@@ -104,6 +111,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productos", key = "#p0 + '-' + #p1 + '-' + #p2 + '-' + #p3")
     public PaginaResponse<ProductoResponseDTO> listar(int pagina, int tamanio,
                                                      String ordenarPor, String direccion) {
         var pageable = Paginacion.crear(pagina, tamanio, ordenarPor, direccion, "nombre", "asc",

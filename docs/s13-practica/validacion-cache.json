@@ -1,0 +1,21 @@
+{
+  "fecha": "2026-11-05",
+  "build": "Pasa",
+  "pruebas": {
+    "tests": 75,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 10
+  },
+  "aprobadas": 65,
+  "redisIntegracion": 6,
+  "fallbackRealConexionInaccesible": 1,
+  "fallbackErroresInyectados": 1,
+  "basePruebas": "H2",
+  "redisTestDatabase": 15,
+  "redisTestPrefix": "s13-test::",
+  "oracleModificado": false,
+  "migracionesModificadas": false,
+  "commitsRealizados": false,
+  "capturasManuales": "Pendientes"
+}
