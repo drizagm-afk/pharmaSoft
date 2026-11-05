@@ -37,6 +37,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 class SeguridadIntegrationTest {
+    @Test
+    void requestIdSeIncluyeEnRespuestasPublicasYRechazosDeSeguridad() throws Exception {
+        var salud = mvc.perform(get("/api/health").header("Origin", "http://localhost:4200"))
+                .andExpect(status().isOk()).andReturn();
+        assertThat(salud.getResponse().getHeader("X-Request-Id")).matches("[a-f0-9]{8}");
+        assertThat(salud.getResponse().getHeader("Access-Control-Expose-Headers")).contains("X-Request-Id");
+        var anonimo = mvc.perform(get("/api/v1/categorias"))
+                .andExpect(status().isUnauthorized()).andReturn();
+        assertThat(anonimo.getResponse().getHeader("X-Request-Id")).matches("[a-f0-9]{8}");
+        var prohibido = mvc.perform(get("/api/v1/usuarios").header("Authorization", bearer("vendedor")))
+                .andExpect(status().isForbidden()).andReturn();
+        assertThat(prohibido.getResponse().getHeader("X-Request-Id")).matches("[a-f0-9]{8}");
+        assertThat(org.slf4j.MDC.get("requestId")).isNull();
+    }
+
     private String cambioPassword(String actual, String nueva) {
         return "{\"passwordActual\":\"" + actual + "\",\"passwordNueva\":\"" + nueva + "\"}";
     }
