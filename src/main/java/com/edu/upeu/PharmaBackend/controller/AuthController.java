@@ -1,5 +1,8 @@
 package com.edu.upeu.PharmaBackend.controller;
 
+import org.springframework.web.bind.annotation.PutMapping;
+import com.edu.upeu.PharmaBackend.dto.auth.CambioPasswordRequestDTO;
+
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,6 +19,12 @@ import com.edu.upeu.PharmaBackend.service.service.AuthService;
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
+    @PutMapping("/password")
+    public ResponseEntity<Void> cambiarPassword(Authentication authentication,
+            @Valid @RequestBody CambioPasswordRequestDTO request) {
+        authService.cambiarPassword(authentication.getName(), request);
+        return ResponseEntity.noContent().build();
+    }
 
     private final AuthService authService;
 
