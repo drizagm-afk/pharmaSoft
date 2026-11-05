@@ -52,6 +52,8 @@ public class SecurityConfig {
             "/api/v1/auth/login",
             "/api/health",
             "/api/v1/health",
+            "/actuator/health",
+            "/actuator/health/**",
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs/**",
@@ -107,6 +109,10 @@ public class SecurityConfig {
                         // Administracion de la seguridad
                         .requestMatchers("/api/v1/usuarios/**",
                                 "/api/v1/empleados/**", "/api/v1/roles/**")
+                        .hasAuthority(USUARIOS_ADMINISTRAR.name())
+
+                        // Solo salud es publica; metricas e info son administrativas.
+                        .requestMatchers("/actuator/**")
                         .hasAuthority(USUARIOS_ADMINISTRAR.name())
 
                         // Todo lo demas (auth/me, reportes...) exige un usuario

@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /** Real security chain and JPA services against an isolated, rolled-back database. */
 @SpringBootTest(properties = {
         "spring.cache.type=none",
+        "management.health.redis.enabled=false",
         "spring.datasource.url=jdbc:h2:mem:security;MODE=Oracle;DB_CLOSE_DELAY=-1",
         "spring.datasource.driver-class-name=org.h2.Driver",
         "spring.datasource.username=sa", "spring.datasource.password=",
@@ -37,6 +38,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 class SeguridadIntegrationTest {
+    @Test
+    void saludPublicaNoRevelaDetallesYAdminPuedeVerlos() throws Exception {
+        mvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.components").doesNotExist());
+        mvc.perform(get("/actuator/health").header("Authorization", bearer("vendedor")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.components").doesNotExist());
+        mvc.perform(get("/actuator/health").header("Authorization", bearer("admin")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.components.db.status").value("UP"))
+                .andExpect(jsonPath("$.components.diskSpace.status").value("UP"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/actuator/metrics", "/actuator/info", "/actuator/metrics/http.server.requests"})
+    void monitoreoExigePermisoAdministrativo(String ruta) throws Exception {
+        mvc.perform(get("/api/health")).andExpect(status().isOk());
+        mvc.perform(get(ruta)).andExpect(status().isUnauthorized());
+        mvc.perform(get(ruta).header("Authorization", bearer("vendedor"))).andExpect(status().isForbidden());
+        mvc.perform(get(ruta).header("Authorization", bearer("admin"))).andExpect(status().isOk());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/actuator/health/liveness", "/actuator/health/readiness"})
+    void probesSonPublicasSinDetalles(String ruta) throws Exception {
+        mvc.perform(get(ruta)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.components").doesNotExist());
+    }
+
     @Test
     void requestIdSeIncluyeEnRespuestasPublicasYRechazosDeSeguridad() throws Exception {
         var salud = mvc.perform(get("/api/health").header("Origin", "http://localhost:4200"))

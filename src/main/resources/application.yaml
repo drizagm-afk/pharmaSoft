@@ -20,3 +20,15 @@ spring:
     redis:
       time-to-live: 10m
       enable-statistics: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+      roles: ADMIN
+      probes:
+        enabled: true

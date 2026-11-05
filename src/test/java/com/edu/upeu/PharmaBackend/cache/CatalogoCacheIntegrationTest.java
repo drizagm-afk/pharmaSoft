@@ -12,6 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,7 +35,9 @@ import static org.assertj.core.api.Assertions.*;
         "spring.flyway.enabled=false", "spring.data.redis.database=15",
         "spring.cache.redis.key-prefix=s13-test::"})
 @EnabledIfSystemProperty(named = "pharma.cache.integration", matches = "true")
+@AutoConfigureMockMvc
 class CatalogoCacheIntegrationTest {
+    @Autowired MockMvc mvc;
     @Autowired CategoriaService categorias;
     @Autowired ProductoService productos;
     @Autowired VentaService ventas;
@@ -64,6 +71,17 @@ class CatalogoCacheIntegrationTest {
 
     private ProductoRequestDTO producto(String nombre, int stock) {
         return new ProductoRequestDTO(nombre, null, new BigDecimal("2.00"), stock, categoriaId, true);
+    }
+
+    @Test
+    @WithMockUser(authorities = {"ROLE_ADMIN", "USUARIOS_ADMINISTRAR"})
+    void metricasRegistranHitsYSaludIncluyeRedisParaAdmin() throws Exception {
+        categorias.readAll(); categorias.readAll();
+        mvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.components.redis.status").value("UP"));
+        mvc.perform(get("/actuator/metrics/cache.gets").param("tag", "name:categorias", "result:hit"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.measurements[0].value", org.hamcrest.Matchers.greaterThan(0.0)));
     }
 
     @Test
