@@ -39,6 +39,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class SeguridadIntegrationTest {
     @Test
+    void erroresDeControladorYSeguridadCompartenIdConLaCabecera() throws Exception {
+        String admin = bearer("admin");
+        var peticiones = List.of(
+                get("/api/v1/productos"),
+                get("/actuator/metrics").header("Authorization", bearer("vendedor")),
+                get("/api/v1/productos/999999999").header("Authorization", admin),
+                post("/api/v1/categorias").header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"),
+                post("/api/v1/categorias").header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON).content("{"),
+                put("/api/v1/auth/password").header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cambioPassword("Incorrecta2026", "NuevaClave2026")),
+                post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"admin\",\"password\":\"Incorrecta2026\"}"));
+        int[] estados = {401, 403, 404, 400, 400, 409, 401};
+        var ids = new HashSet<String>();
+        for (int i = 0; i < peticiones.size(); i++) {
+            var resultado = mvc.perform(peticiones.get(i))
+                    .andExpect(status().is(estados[i]))
+                    .andExpect(jsonPath("$.message").isString());
+            String id = resultado.andReturn().getResponse().getHeader("X-Request-Id");
+            assertThat(id).matches("[a-f0-9]{8}");
+            resultado.andExpect(jsonPath("$.requestId").value(id));
+            assertThat(ids.add(id)).isTrue();
+            assertThat(org.slf4j.MDC.get("requestId")).isNull();
+        }
+    }
+
+    @Test
     void saludPublicaNoRevelaDetallesYAdminPuedeVerlos() throws Exception {
         mvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("UP"))
