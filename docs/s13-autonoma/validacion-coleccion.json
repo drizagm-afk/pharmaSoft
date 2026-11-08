@@ -1,0 +1,8 @@
+{
+  "requests": 26,
+  "scripts": 35,
+  "syntheticAssertions": 60,
+  "runnerSimulation": "20 requests per cache, first=100 ms, next19 mean=10 ms",
+  "metricSimulation": "19 hits + 1 miss = 95%",
+  "realRequestsExecuted": 0
+}
