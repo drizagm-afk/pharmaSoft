@@ -1,0 +1,190 @@
+[
+  {
+    "kind": "history",
+    "version": "1",
+    "description": "<< Flyway Baseline >>",
+    "type": "BASELINE",
+    "success": 1
+  },
+  {
+    "kind": "history",
+    "version": "2",
+    "description": "seguridad",
+    "type": "SQL",
+    "success": 1
+  },
+  {
+    "kind": "history",
+    "version": "4",
+    "description": "auditoria",
+    "type": "SQL",
+    "success": 1
+  },
+  {
+    "kind": "column",
+    "table": "AUDITORIA_EVENTOS",
+    "column": "ID",
+    "type": "NUMBER",
+    "length": 0,
+    "nullable": "N"
+  },
+  {
+    "kind": "column",
+    "table": "AUDITORIA_EVENTOS",
+    "column": "FECHA",
+    "type": "TIMESTAMP(6)",
+    "length": 0,
+    "nullable": "N"
+  },
+  {
+    "kind": "column",
+    "table": "AUDITORIA_EVENTOS",
+    "column": "USUARIO",
+    "type": "VARCHAR2",
+    "length": 50,
+    "nullable": "N"
+  },
+  {
+    "kind": "column",
+    "table": "AUDITORIA_EVENTOS",
+    "column": "ACCION",
+    "type": "VARCHAR2",
+    "length": 40,
+    "nullable": "N"
+  },
+  {
+    "kind": "column",
+    "table": "AUDITORIA_EVENTOS",
+    "column": "ENTIDAD",
+    "type": "VARCHAR2",
+    "length": 40,
+    "nullable": "N"
+  },
+  {
+    "kind": "column",
+    "table": "AUDITORIA_EVENTOS",
+    "column": "ENTIDAD_ID",
+    "type": "NUMBER",
+    "length": 0,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "AUDITORIA_EVENTOS",
+    "column": "DETALLE",
+    "type": "VARCHAR2",
+    "length": 500,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "AUDITORIA_EVENTOS",
+    "column": "REQUEST_ID",
+    "type": "VARCHAR2",
+    "length": 36,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "CATEGORIAS",
+    "column": "CREADO_POR",
+    "type": "VARCHAR2",
+    "length": 50,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "CATEGORIAS",
+    "column": "MODIFICADO_POR",
+    "type": "VARCHAR2",
+    "length": 50,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "CLIENTES",
+    "column": "CREADO_POR",
+    "type": "VARCHAR2",
+    "length": 50,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "CLIENTES",
+    "column": "MODIFICADO_POR",
+    "type": "VARCHAR2",
+    "length": 50,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "PRODUCTOS",
+    "column": "CREADO_POR",
+    "type": "VARCHAR2",
+    "length": 50,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "PRODUCTOS",
+    "column": "MODIFICADO_POR",
+    "type": "VARCHAR2",
+    "length": 50,
+    "nullable": "Y"
+  },
+  {
+    "kind": "column",
+    "table": "VENTAS",
+    "column": "CREADO_POR",
+    "type": "VARCHAR2",
+    "length": 50,
+    "nullable": "Y"
+  },
+  {
+    "kind": "index",
+    "table": "AUDITORIA_EVENTOS",
+    "name": "IX_AUDITORIA_FECHA",
+    "column": "FECHA",
+    "position": 1
+  },
+  {
+    "kind": "index",
+    "table": "AUDITORIA_EVENTOS",
+    "name": "IX_AUDITORIA_USUARIO",
+    "column": "USUARIO",
+    "position": 1
+  },
+  {
+    "kind": "index",
+    "table": "AUDITORIA_EVENTOS",
+    "name": "IX_AUDITORIA_USUARIO",
+    "column": "FECHA",
+    "position": 2
+  },
+  {
+    "kind": "index",
+    "table": "PRODUCTOS",
+    "name": "IX_PRODUCTOS_NOMBRE",
+    "column": "NOMBRE",
+    "position": 1
+  },
+  {
+    "kind": "index",
+    "table": "AUDITORIA_EVENTOS",
+    "name": "PK_AUDITORIA_EVENTOS",
+    "column": "ID",
+    "position": 1
+  },
+  {
+    "kind": "index",
+    "table": "PRODUCTOS",
+    "name": "SYS_C008679",
+    "column": "ID",
+    "position": 1
+  },
+  {
+    "kind": "counts",
+    "products": 5011,
+    "sales": 20012
+  }
+]

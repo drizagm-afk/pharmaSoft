@@ -1,0 +1,28 @@
+[
+  {
+    "kind": "history",
+    "version": "1",
+    "description": "<< Flyway Baseline >>",
+    "type": "BASELINE",
+    "success": 1
+  },
+  {
+    "kind": "history",
+    "version": "2",
+    "description": "seguridad",
+    "type": "SQL",
+    "success": 1
+  },
+  {
+    "kind": "index",
+    "table": "PRODUCTOS",
+    "name": "SYS_C008679",
+    "column": "ID",
+    "position": 1
+  },
+  {
+    "kind": "counts",
+    "products": 5011,
+    "sales": 20012
+  }
+]
