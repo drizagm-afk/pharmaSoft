@@ -1,0 +1,21 @@
+{
+  "fecha": "2026-11-05",
+  "bloque": "Actuator",
+  "pruebas": {
+    "tests": 88,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 10
+  },
+  "aprobadas": 78,
+  "saludPublicaSinDetalles": "Pasa",
+  "detallesSoloAdmin": "Pasa",
+  "metricasAdmin200Vendedor403Anonimo401": "Pasa",
+  "probesPublicas": "Pasa",
+  "cacheGetsHitRedisReal": "Pasa",
+  "redisInaccesibleSaludDown503": "Pasa",
+  "fallbackBaseDatosConRedisInaccesible": "Pasa",
+  "oracleModificado": false,
+  "capturasManuales": "Pendientes",
+  "commitsRealizadosPorAsistente": false
+}

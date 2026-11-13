@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VentaResponseDTO {
+    private String creadoPor;
     private Long id;
     private LocalDateTime fecha;
 

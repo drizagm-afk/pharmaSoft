@@ -14,12 +14,18 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationEventPublisher;
+import com.edu.upeu.PharmaBackend.auditoria.EventoAuditoria;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
 import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 import com.edu.upeu.PharmaBackend.service.support.Paginacion;
+import com.edu.upeu.PharmaBackend.service.support.Busqueda;
+import org.springframework.data.domain.Page;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +33,11 @@ public class ProductoServiceImpl implements ProductoService {
     private static final Logger logger = LoggerFactory.getLogger(ProductoServiceImpl.class);
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final ApplicationEventPublisher eventos;
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public ProductoResponseDTO create(ProductoRequestDTO request) {
         String nombre = request.getNombre().trim();
         request.setNombre(nombre);
@@ -53,6 +61,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public ProductoResponseDTO update(Long id, ProductoRequestDTO request) {
         request.setNombre(request.getNombre().trim());
 
@@ -66,14 +75,20 @@ public class ProductoServiceImpl implements ProductoService {
                 new RecursosNoEncontradosException("Producto no encontrado con id: " + id)
         );
 
+        var precioAnterior = producto.getPrecio();
         ProductoMapper.ConvertFromRequest(producto, request, categoria);
-        productoRepository.save(producto);
+        productoRepository.saveAndFlush(producto);
+        if (precioAnterior.compareTo(producto.getPrecio()) != 0) {
+            eventos.publishEvent(EventoAuditoria.de("PRECIO_MODIFICADO", "Producto",
+                    producto.getId(), precioAnterior + " -> " + producto.getPrecio()));
+        }
 
         return ProductoMapper.ConvertToResponse(producto);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productos", key = "'id-' + #p0")
     public ProductoResponseDTO read(Long id) {
         var optProducto = productoRepository.findById(id);
         if (optProducto.isEmpty())
@@ -84,6 +99,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = "productos", allEntries = true)
     public void delete(Long id) {
         Producto producto = productoRepository.findById(id).orElseThrow(() ->
                 new RecursosNoEncontradosException("Producto no encontrado con id: " + id));
@@ -91,10 +107,13 @@ public class ProductoServiceImpl implements ProductoService {
             throw new ReglaNegocioException("El producto ya está inactivo.");
         }
         producto.setEstado(false);
+        eventos.publishEvent(EventoAuditoria.de("PRODUCTO_ELIMINADO", "Producto",
+                producto.getId(), producto.getNombre()));
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productos", key = "'todas'")
     public List<ProductoResponseDTO> readAll() {
         return productoRepository.findAll()
                 .stream()
@@ -104,6 +123,19 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional(readOnly = true)
+    public PaginaResponse<ProductoResponseDTO> buscarParaVenta(String texto, int pagina, int tamanio) {
+        var pageable = Paginacion.crear(pagina, tamanio, "nombre", "asc",
+                "nombre", "asc", Set.of("nombre"));
+        String normalizado = Busqueda.normalizar(texto);
+        var resultado = normalizado.isEmpty()
+                ? Page.<Producto>empty(pageable)
+                : productoRepository.buscarParaVenta(normalizado, pageable);
+        return PaginaResponse.de(resultado.map(ProductoMapper::ConvertToResponse));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productos", key = "#p0 + '-' + #p1 + '-' + #p2 + '-' + #p3")
     public PaginaResponse<ProductoResponseDTO> listar(int pagina, int tamanio,
                                                      String ordenarPor, String direccion) {
         var pageable = Paginacion.crear(pagina, tamanio, ordenarPor, direccion, "nombre", "asc",

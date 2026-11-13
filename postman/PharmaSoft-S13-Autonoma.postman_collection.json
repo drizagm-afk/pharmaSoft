@@ -1,0 +1,995 @@
+{
+  "info": {
+    "_postman_id": "5a8106b2-36d2-4020-bde9-ac723f027c44",
+    "name": "PharmaSoft S13 Autónoma — Partes C y D",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Ejecutar por carpetas según docs/s13-autonoma/etapa-04.md. NO ejecutar la colección completa. Solo la carpeta 02 se ejecuta con 20 iteraciones. Las operaciones de la matriz se realizan UNA vez en la SPA; esta colección solo lee resultados y obtiene tokens. Contraseña y tokens exportados vacíos."
+  },
+  "variable": [
+    {
+      "key": "backendUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminUsername",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tokenAdmin",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoriaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoriaNombreNuevo",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "precioNuevo",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stockAntesVenta",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cantidadVendida",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ventaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "requestIdVenta",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 — Login admin",
+      "description": "Completar adminPassword localmente; valor inicial demo Admin2026* si no se cambió. Renovar tras reiniciar Java. No capturar/exportar token.",
+      "item": [
+        {
+          "name": "Login y guardar token",
+          "request": {
+            "method": "POST",
+            "url": "{{backendUrl}}/api/v1/auth/login",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{adminUsername}}\",\"password\":\"{{adminPassword}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.unset(\"tokenAdmin\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const b=pm.response.json();pm.test(\"Token\",()=>pm.expect(b.token).to.be.a(\"string\").and.not.empty);if(b.token)pm.collectionVariables.set(\"tokenAdmin\",b.token);}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 — Snapshot ANTES (1 ejecución)",
+      "description": "Ejecutar UNA vez, sin listar catálogos desde SPA ni desde otras carpetas durante el experimento. Capturar valores reales de hits y misses.",
+      "item": [
+        {
+          "name": "categorias: hit (antes)",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:categorias&tag=result:hit",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const m=pm.response.json().measurements.find(m=>m.statistic==='COUNT');pm.test('COUNT presente',()=>pm.expect(m).to.exist);if(m)pm.collectionVariables.set('antes_categorias_hit',m.value);}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "categorias: miss (antes)",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:categorias&tag=result:miss",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const m=pm.response.json().measurements.find(m=>m.statistic==='COUNT');pm.test('COUNT presente',()=>pm.expect(m).to.exist);if(m)pm.collectionVariables.set('antes_categorias_miss',m.value);}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "productos: hit (antes)",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:productos&tag=result:hit",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const m=pm.response.json().measurements.find(m=>m.statistic==='COUNT');pm.test('COUNT presente',()=>pm.expect(m).to.exist);if(m)pm.collectionVariables.set('antes_productos_hit',m.value);}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "productos: miss (antes)",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:productos&tag=result:miss",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const m=pm.response.json().measurements.find(m=>m.statistic==='COUNT');pm.test('COUNT presente',()=>pm.expect(m).to.exist);if(m)pm.collectionVariables.set('antes_productos_miss',m.value);}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 — SOLO Runner: 20 iteraciones",
+      "description": "Seleccionar SOLO esta carpeta, Iterations=20, Delay=0. Produce exactamente 20 GET por catálogo. No incluir login, métricas ni matriz. Backend recién reiniciado, claves de estos listados eliminadas y sin tráfico de SPA. Verificar que ninguna petición falló.",
+      "item": [
+        {
+          "name": "Medir categorias",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){",
+                  " const key='tiempos_categorias';const muestras=Number(pm.info.iteration)===0?[]:JSON.parse(pm.collectionVariables.get(key)||'[]');",
+                  " muestras.push(pm.response.responseTime);pm.collectionVariables.set(key,JSON.stringify(muestras));",
+                  " if(muestras.length===20){const siguientes=muestras.slice(1);pm.collectionVariables.set('resumen_categorias_tiempos',JSON.stringify({unidad:'ms',primerGet:muestras[0],mediaSiguientes19:siguientes.reduce((a,b)=>a+b,0)/19,muestras:20}));}",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Medir productos",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/productos?pagina=0",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){",
+                  " const key='tiempos_productos';const muestras=Number(pm.info.iteration)===0?[]:JSON.parse(pm.collectionVariables.get(key)||'[]');",
+                  " muestras.push(pm.response.responseTime);pm.collectionVariables.set(key,JSON.stringify(muestras));",
+                  " if(muestras.length===20){const siguientes=muestras.slice(1);pm.collectionVariables.set('resumen_productos_tiempos',JSON.stringify({unidad:'ms',primerGet:muestras[0],mediaSiguientes19:siguientes.reduce((a,b)=>a+b,0)/19,muestras:20}));}",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 — Snapshot DESPUÉS y tasas (1 ejecución)",
+      "description": "Ejecutar UNA vez, sin listar catálogos desde SPA ni desde otras carpetas durante el experimento. Capturar valores reales de hits y misses.",
+      "item": [
+        {
+          "name": "categorias: hit (despues)",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:categorias&tag=result:hit",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const m=pm.response.json().measurements.find(m=>m.statistic==='COUNT');pm.test('COUNT presente',()=>pm.expect(m).to.exist);if(m)pm.collectionVariables.set('despues_categorias_hit',m.value);}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "categorias: miss (despues)",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:categorias&tag=result:miss",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const m=pm.response.json().measurements.find(m=>m.statistic==='COUNT');pm.test('COUNT presente',()=>pm.expect(m).to.exist);if(m)pm.collectionVariables.set('despues_categorias_miss',m.value);}",
+                  "const read=k=>{const raw=pm.collectionVariables.get(k);if(raw===undefined||raw===null||raw==='')throw Error('Falta snapshot: '+k);return Number(raw);};",
+                  "if(pm.response.code===200){const hits=read('despues_categorias_hit')-read('antes_categorias_hit');const misses=read('despues_categorias_miss')-read('antes_categorias_miss');const total=hits+misses;pm.test('20 lecturas medidas sin tráfico adicional',()=>pm.expect(total).to.equal(20));pm.test('Contadores no retroceden',()=>{pm.expect(hits).to.be.at.least(0);pm.expect(misses).to.be.at.least(0);});pm.collectionVariables.set('resumen_categorias_cache',JSON.stringify({hits,misses,total,tasaAciertosPorcentaje:total>0?100*hits/total:null}));}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "productos: hit (despues)",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:productos&tag=result:hit",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const m=pm.response.json().measurements.find(m=>m.statistic==='COUNT');pm.test('COUNT presente',()=>pm.expect(m).to.exist);if(m)pm.collectionVariables.set('despues_productos_hit',m.value);}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "productos: miss (despues)",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:productos&tag=result:miss",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const m=pm.response.json().measurements.find(m=>m.statistic==='COUNT');pm.test('COUNT presente',()=>pm.expect(m).to.exist);if(m)pm.collectionVariables.set('despues_productos_miss',m.value);}",
+                  "const read=k=>{const raw=pm.collectionVariables.get(k);if(raw===undefined||raw===null||raw==='')throw Error('Falta snapshot: '+k);return Number(raw);};",
+                  "if(pm.response.code===200){const hits=read('despues_productos_hit')-read('antes_productos_hit');const misses=read('despues_productos_miss')-read('antes_productos_miss');const total=hits+misses;pm.test('20 lecturas medidas sin tráfico adicional',()=>pm.expect(total).to.equal(20));pm.test('Contadores no retroceden',()=>{pm.expect(hits).to.be.at.least(0);pm.expect(misses).to.be.at.least(0);});pm.collectionVariables.set('resumen_productos_cache',JSON.stringify({hits,misses,total,tasaAciertosPorcentaje:total>0?100*hits/total:null}));}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 — TTL: lectura para crear clave",
+      "description": "Usar después de reiniciar con SPRING_CACHE_REDIS_TIME_TO_LIVE=1m y eliminar categorias::todas. Tras la lectura, no volver a leer hasta comprobar TTL=-2 con redis-cli. Restaurar 10m al terminar.",
+      "item": [
+        {
+          "name": "Crear entrada de categorías",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 — Matriz C-01 a C-05: comprobaciones",
+      "description": "Las escrituras se hacen manualmente en la SPA. Calentar las lecturas ANTES de cada escritura, leer DESPUÉS de inmediato. Configurar IDs/valores esperados. El producto elegido debe pertenecer a la categoría renombrada. C-05 usa una categoría diferente y sin productos.",
+      "item": [
+        {
+          "name": "C-01 — Categoría creada figura en lista",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!Number.isInteger(Number(pm.collectionVariables.get(\"categoriaId\")))||Number(pm.collectionVariables.get(\"categoriaId\"))<=0) throw Error(\"Completar categoriaId con un ID positivo\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Categoría presente\",()=>pm.expect(pm.response.json().some(c=>c.id===Number(pm.collectionVariables.get(\"categoriaId\")))).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C-02/C-03/C-04 — Leer producto ANTES y guardar referencia",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/productos/{{productoId}}",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!Number.isInteger(Number(pm.collectionVariables.get(\"productoId\")))||Number(pm.collectionVariables.get(\"productoId\"))<=0) throw Error(\"Completar productoId con un ID positivo\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "if(pm.response.code===200){const b=pm.response.json();pm.collectionVariables.set(\"productoAntes\",JSON.stringify(b));pm.collectionVariables.set(\"stockAntesVenta\",b.stock);}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calentar lista de productos ANTES de cada escritura",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/productos?pagina=0&tamanio=100&ordenarPor=nombre&direccion=asc",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!Number.isInteger(Number(pm.collectionVariables.get(\"productoId\")))||Number(pm.collectionVariables.get(\"productoId\"))<=0) throw Error(\"Completar productoId con un ID positivo\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Producto seleccionado en página\",()=>pm.expect(pm.response.json().contenido.some(p=>p.id===Number(pm.collectionVariables.get(\"productoId\")))).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C-02 — Nombre de categoría actualizado en lista",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/productos?pagina=0&tamanio=100&ordenarPor=nombre&direccion=asc",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!Number.isInteger(Number(pm.collectionVariables.get(\"productoId\")))||Number(pm.collectionVariables.get(\"productoId\"))<=0) throw Error(\"Completar productoId con un ID positivo\");",
+                  "if(!pm.collectionVariables.get(\"categoriaNombreNuevo\"))throw Error(\"Completar categoriaNombreNuevo\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Nombre nuevo en producto\",()=>{const p=pm.response.json().contenido.find(p=>p.id===Number(pm.collectionVariables.get(\"productoId\")));pm.expect(p).to.exist;pm.expect(p.categoriaNombre).to.equal(pm.collectionVariables.get(\"categoriaNombreNuevo\"));});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C-03 — Precio nuevo en detalle",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/productos/{{productoId}}",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!Number.isInteger(Number(pm.collectionVariables.get(\"productoId\")))||Number(pm.collectionVariables.get(\"productoId\"))<=0) throw Error(\"Completar productoId con un ID positivo\");",
+                  "if(!(Number(pm.collectionVariables.get(\"precioNuevo\"))>0))throw Error(\"Completar precioNuevo positivo\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Precio actualizado\",()=>{const p=pm.response.json();pm.expect(p).to.exist;pm.expect(Number(p.precio)).to.equal(Number(pm.collectionVariables.get(\"precioNuevo\")));});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C-03 — Precio nuevo en lista",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/productos?pagina=0&tamanio=100&ordenarPor=nombre&direccion=asc",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!Number.isInteger(Number(pm.collectionVariables.get(\"productoId\")))||Number(pm.collectionVariables.get(\"productoId\"))<=0) throw Error(\"Completar productoId con un ID positivo\");",
+                  "if(!(Number(pm.collectionVariables.get(\"precioNuevo\"))>0))throw Error(\"Completar precioNuevo positivo\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Precio actualizado\",()=>{const p=pm.response.json().contenido.find(p=>p.id===Number(pm.collectionVariables.get(\"productoId\")));pm.expect(p).to.exist;pm.expect(Number(p.precio)).to.equal(Number(pm.collectionVariables.get(\"precioNuevo\")));});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C-04 — Stock descontado en lista",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/productos?pagina=0&tamanio=100&ordenarPor=nombre&direccion=asc",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!Number.isInteger(Number(pm.collectionVariables.get(\"productoId\")))||Number(pm.collectionVariables.get(\"productoId\"))<=0) throw Error(\"Completar productoId con un ID positivo\");",
+                  "if(pm.collectionVariables.get(\"stockAntesVenta\")===\"\")throw Error(\"Falta stock anterior\");if(!(Number(pm.collectionVariables.get(\"cantidadVendida\"))>0))throw Error(\"Completar cantidadVendida\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Stock descontado\",()=>{const p=pm.response.json().contenido.find(p=>p.id===Number(pm.collectionVariables.get(\"productoId\")));pm.expect(p).to.exist;pm.expect(p.stock).to.equal(Number(pm.collectionVariables.get(\"stockAntesVenta\"))-Number(pm.collectionVariables.get(\"cantidadVendida\")));});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C-05 — Categoría eliminada ya no figura",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!Number.isInteger(Number(pm.collectionVariables.get(\"categoriaId\")))||Number(pm.collectionVariables.get(\"categoriaId\"))<=0) throw Error(\"Completar categoriaId con un ID positivo\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Categoría ausente\",()=>pm.expect(pm.response.json().some(c=>c.id===Number(pm.collectionVariables.get(\"categoriaId\")))).to.equal(false));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 — C-06 / D: SOLO Redis apagado",
+      "description": "Detener Redis manualmente; comprobar Productos en la SPA y WARN en log. Ejecutar estas dos peticiones antes de restaurarlo.",
+      "item": [
+        {
+          "name": "Health sin token DOWN",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/health",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 503\",()=>pm.response.to.have.status(503));",
+                  "pm.test(\"DOWN sin detalles\",()=>pm.expect(pm.response.json()).to.deep.equal({status:\"DOWN\"}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health admin DOWN",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/health",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 503\",()=>pm.response.to.have.status(503));",
+                  "pm.test(\"Redis DOWN y Oracle UP\",()=>{const b=pm.response.json();pm.expect(b.components.redis.status).to.equal(\"DOWN\");pm.expect(b.components.db.status).to.equal(\"UP\");});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 — D: Redis encendido",
+      "description": "Restaurar Redis y esperar antes de ejecutar. Son las otras dos combinaciones de salud exigidas en Parte D.",
+      "item": [
+        {
+          "name": "Health sin token UP",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/health",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"UP sin detalles\",()=>pm.expect(pm.response.json()).to.deep.equal({status:\"UP\"}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health admin UP",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/health",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Componentes UP\",()=>{const c=pm.response.json().components;for(const n of [\"redis\",\"db\",\"diskSpace\"])pm.expect(c[n].status).to.equal(\"UP\");});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 — D: métricas de ventas y error rastreable",
+      "description": "La venta se registra UNA vez en SPA para obtener su X-Request-Id en Network. Guardar ese ID como requestIdVenta y buscarlo en el log. Esta carpeta no registra ventas ni reemplaza la captura del error visible en SPA.",
+      "item": [
+        {
+          "name": "Ventas: métricas filtradas por URI",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/actuator/metrics/http.server.requests?tag=uri:/api/v1/ventas",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Métrica HTTP de ventas\",()=>{const b=pm.response.json();pm.expect(b.name).to.equal(\"http.server.requests\");pm.expect(b.measurements).to.be.an(\"array\").and.not.empty;});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Producto inexistente: cuerpo y header correlacionados",
+          "request": {
+            "method": "GET",
+            "url": "{{backendUrl}}/api/v1/productos/9223372036854775807",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\",()=>pm.response.to.have.status(404));",
+                  "pm.test(\"ID del cuerpo coincide con header\",()=>{const id=pm.response.headers.get(\"X-Request-Id\");pm.expect(id).to.match(/^[a-f0-9]{8}$/);pm.expect(pm.response.json().requestId).to.equal(id);});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

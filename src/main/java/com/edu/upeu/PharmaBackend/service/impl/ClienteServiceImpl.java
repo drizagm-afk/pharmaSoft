@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 import com.edu.upeu.PharmaBackend.service.support.Paginacion;
+import com.edu.upeu.PharmaBackend.service.support.Busqueda;
+import org.springframework.data.domain.Page;
 
 @Service
 public class ClienteServiceImpl
@@ -121,6 +123,18 @@ public class ClienteServiceImpl
 
     @Override
     @Transactional(readOnly = true)
+    public PaginaResponse<ClienteResponseDTO> buscarParaVenta(String texto, int pagina, int tamanio) {
+        var pageable = Paginacion.crear(pagina, tamanio, "apellidos", "asc",
+                "apellidos", "asc", Set.of("apellidos"));
+        String normalizado = Busqueda.normalizar(texto);
+        var resultado = normalizado.isEmpty()
+                ? Page.<Cliente>empty(pageable)
+                : clienteRepository.buscarParaVenta(normalizado, pageable);
+        return PaginaResponse.de(resultado.map(ClienteMapper::ConvertToResponse));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PaginaResponse<ClienteResponseDTO> listar(int pagina, int tamanio,
                                                     String ordenarPor, String direccion) {
         var pageable = Paginacion.crear(pagina, tamanio, ordenarPor, direccion, "apellidos", "asc",
@@ -186,7 +200,7 @@ public class ClienteServiceImpl
         cliente.setEstado(request.getEstado());
 
         Cliente actualizado =
-                clienteRepository.save(cliente);
+                clienteRepository.saveAndFlush(cliente);
 
         log.info(
                 "Cliente id={} actualizado correctamente",

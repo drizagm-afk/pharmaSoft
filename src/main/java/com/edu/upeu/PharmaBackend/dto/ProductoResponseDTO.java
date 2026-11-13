@@ -5,12 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductoResponseDTO {
+public class ProductoResponseDTO implements Serializable {
+    private String creadoPor;
+    private String modificadoPor;
+    private static final long serialVersionUID = 1L;
     private Long id;
     private String nombre;
     private String descripcion;

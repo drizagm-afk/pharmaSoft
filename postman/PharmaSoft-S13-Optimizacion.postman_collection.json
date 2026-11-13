@@ -1,0 +1,1284 @@
+{
+  "info": {
+    "_postman_id": "77ca40b1-1e42-4275-b98c-f50052d97a6a",
+    "name": "PharmaSoft S13 — Optimización y producción",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Ejecutar por carpetas, NO Run collection completo: las fases Redis DOWN/UP y dev/prod requieren intervención manual. Obtener tokens en 00 tras cada reinicio/cambio de JWT. Configurar IDs antes de ventas. P01–P06 y P14 necesitan además navegador/terminal/logs. Credenciales demo editables; no hay tokens exportados."
+  },
+  "variable": [
+    {
+      "key": "backendUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "webUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "adminUsername",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "Admin2026*",
+      "type": "string"
+    },
+    {
+      "key": "vendedorUsername",
+      "value": "vendedor",
+      "type": "string"
+    },
+    {
+      "key": "vendedorPassword",
+      "value": "Vendedor2026*",
+      "type": "string"
+    },
+    {
+      "key": "tokenAdmin",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tokenVendedor",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoriaNombre",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoriaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clienteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cantidad",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "stockAntes",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ventaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mainAsset",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stylesAsset",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 — Diagnóstico y login",
+      "description": "Primero comprobar salud directa y proxy. Los logins guardan tokens en variables de colección, sin imprimirlos. Contraseñas iniciales demo; usar las vigentes si se cambiaron.",
+      "item": [
+        {
+          "name": "Salud backend directa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/health",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Salud por Nginx — detectar 502",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{webUrl}}/api/v1/health",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login admin — guardar token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{backendUrl}}/api/v1/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.unset(\"tokenAdmin\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  " const data=pm.response.json();",
+                  " pm.test(\"Token recibido\",()=>pm.expect(data.token).to.be.a(\"string\").and.not.empty);",
+                  " if(data.token) pm.collectionVariables.set(\"tokenAdmin\",data.token);",
+                  "}",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login vendedor — guardar token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{backendUrl}}/api/v1/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{vendedorUsername}}\",\n  \"password\": \"{{vendedorPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.unset(\"tokenVendedor\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  " const data=pm.response.json();",
+                  " pm.test(\"Token recibido\",()=>pm.expect(data.token).to.be.a(\"string\").and.not.empty);",
+                  " if(data.token) pm.collectionVariables.set(\"tokenVendedor\",data.token);",
+                  "}",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login admin a través de Nginx",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{webUrl}}/api/v1/auth/login",
+            "description": "Confirma POST por proxy. No capturar el token de la respuesta.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 — P07 — Caché de categorías (perfil dev)",
+      "description": "Usar dev para observar SQL. Obtener token nuevo en 00. Antes de la primera petición: docker compose -f deploy/docker-compose.yml exec redis redis-cli DEL categorias::todas. Ejecutar ambas seguidas. Las pruebas HTTP no demuestran ausencia de SQL: capturar consola y TTL manualmente.",
+      "item": [
+        {
+          "name": "P07.1 — GET categorías frío",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));",
+                  "pm.collectionVariables.set(\"categoriasTiempo1Ms\",pm.response.responseTime);",
+                  "pm.test(\"Lista de categorías\",()=>pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P07.2 — GET categorías repetido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));",
+                  "pm.collectionVariables.set(\"categoriasTiempo2Ms\",pm.response.responseTime);",
+                  "pm.test(\"Lista de categorías\",()=>pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 — P08 — Crear categoría e invalidar (prod)",
+      "description": "Volver a prod y renovar tokens. Esta carpeta CREA una categoría. El nombre se genera una vez al crear; el ID se guarda para su revisión. No repetir el POST si ya se creó.",
+      "item": [
+        {
+          "name": "P08.1 — Llenar caché de categorías",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P08.2 — Crear categoría de prueba",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"{{categoriaNombre}}\",\"descripcion\":\"Validación de invalidación S13\",\"estado\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"categoriaNombre\",\"Validacion S13 \"+Date.now());",
+                  "pm.collectionVariables.unset(\"categoriaId\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if(pm.response.code===201) pm.collectionVariables.set(\"categoriaId\",pm.response.json().id);",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P08.3 — Comprobar categoría en lista",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"La lista incluye la categoría creada\",()=>{ const id=Number(pm.collectionVariables.get(\"categoriaId\")); pm.expect(id).to.be.above(0); pm.expect(pm.response.json().some(c=>c.id===id)).to.equal(true); });",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 — P09 — Venta e invalidación de stock",
+      "description": "Preferiblemente registrar la venta en la SPA para capturar interacción. Alternativamente esta carpeta registra UNA venta real. Primero completar clienteId activo, productoId activo con stock y cantidad. No ejecutar el POST dos veces. El listado anterior llena caché paginada; el posterior comprueba el mismo listado. Si se usa SPA, omitir POST y guardar cantidad/stockAntes manualmente.",
+      "item": [
+        {
+          "name": "Consultar clientes para elegir ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/clientes?pagina=0&tamanio=100",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P09.1 — Listar productos y guardar stock anterior",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/productos?pagina=0&tamanio=100&ordenarPor=nombre&direccion=asc",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const p=pm.response.json().contenido.find(p=>p.id===Number(pm.collectionVariables.get(\"productoId\")));",
+                  "pm.test(\"Producto seleccionado activo y stock suficiente\",()=>{pm.expect(p,\"Completar productoId y comprobar que figura en esta página\").to.exist;pm.expect(p.estado).to.equal(true);pm.expect(Number(pm.collectionVariables.get(\"cantidad\"))).to.be.above(0);pm.expect(p.stock).to.be.at.least(Number(pm.collectionVariables.get(\"cantidad\")));});",
+                  "if(p) pm.collectionVariables.set(\"stockAntes\",p.stock);",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P09.2 — Registrar UNA venta (escritura real)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{backendUrl}}/api/v1/ventas",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"clienteId\":{{clienteId}},\"detalles\":[{\"productoId\":{{productoId}},\"cantidad\":{{cantidad}}}]}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "for(const key of [\"clienteId\",\"productoId\",\"cantidad\"]) {if(!Number.isInteger(Number(pm.collectionVariables.get(key)))||Number(pm.collectionVariables.get(key))<=0) throw new Error(\"Completar variable positiva: \"+key);}",
+                  "if(pm.collectionVariables.get(\"stockAntes\")===\"\") throw new Error(\"Ejecutar antes P09.1\");",
+                  "if(pm.collectionVariables.get(\"ventaId\")) {pm.execution.skipRequest();throw new Error(\"Ya existe ventaId; revisar la venta antes de registrar otra\");}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "if(pm.response.code===201) pm.collectionVariables.set(\"ventaId\",pm.response.json().id);",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P09.3 — Listado refleja descuento de stock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/productos?pagina=0&tamanio=100&ordenarPor=nombre&direccion=asc",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Stock actualizado en la lista cacheada\",()=>{const p=pm.response.json().contenido.find(p=>p.id===Number(pm.collectionVariables.get(\"productoId\")));pm.expect(p).to.exist;pm.expect(p.stock).to.equal(Number(pm.collectionVariables.get(\"stockAntes\"))-Number(pm.collectionVariables.get(\"cantidad\")));});",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 — P10 — SOLO con Redis detenido",
+      "description": "Detener Redis manualmente antes de ejecutar: docker compose -f deploy/docker-compose.yml stop redis. NO escribir datos durante la caída. Capturar también WARN del backend. Esta carpeta falla intencionadamente si Redis está encendido.",
+      "item": [
+        {
+          "name": "P10.1 — Categorías siguen disponibles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P10.2 — Salud pública DOWN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/health",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 503\", () => pm.response.to.have.status(503));",
+                  "pm.test(\"DOWN sin detalles\",()=>pm.expect(pm.response.json()).to.deep.equal({status:\"DOWN\"}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P10.3 — Admin identifica Redis DOWN y Oracle UP",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/health",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 503\", () => pm.response.to.have.status(503));",
+                  "pm.test(\"Redis DOWN, base UP\",()=>{const b=pm.response.json();pm.expect(b.components.redis.status).to.equal(\"DOWN\");pm.expect(b.components.db.status).to.equal(\"UP\");});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 — P10 recuperación y P12 — Redis encendido",
+      "description": "Restaurar Redis manualmente: docker compose -f deploy/docker-compose.yml start redis. Esperar healthy. No ejecutar junto con la carpeta 04 en Runner.",
+      "item": [
+        {
+          "name": "P10.4 — Categorías recuperadas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P12.1 — Salud pública UP sin detalles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/health",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"UP sin detalles\",()=>pm.expect(pm.response.json()).to.deep.equal({status:\"UP\"}));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P12.2 — Admin ve componentes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/health",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Componentes UP\",()=>{const c=pm.response.json().components;for(const name of [\"db\",\"redis\",\"diskSpace\"])pm.expect(c[name].status).to.equal(\"UP\");});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P12 — liveness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/health/liveness",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"UP\",()=>pm.expect(pm.response.json().status).to.equal(\"UP\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P12 — readiness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/health/readiness",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"UP\",()=>pm.expect(pm.response.json().status).to.equal(\"UP\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 — P11 — Request ID",
+      "description": "Capturar Response Headers y buscar ese mismo ID en logs/pharma-backend.log. La prueba HTTP valida el formato, no demuestra por sí sola la correlación con el archivo.",
+      "item": [
+        {
+          "name": "P11 — Categorías con Request ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));",
+                  "pm.collectionVariables.set(\"ultimoRequestId\",pm.response.headers.get(\"X-Request-Id\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 — P13 — Permisos y métricas",
+      "description": "Obtener tokens admin y vendedor en el mismo proceso actual. Ejecutar en orden para producir al menos un hit antes de medir. Los contadores se reinician con Java.",
+      "item": [
+        {
+          "name": "P13.1 — Vendedor: métricas prohibidas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/metrics",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenVendedor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P13.2 — Anónimo: métricas sin autenticar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/metrics",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P13.3 — Admin: métricas permitidas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/metrics",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Nombres de métricas\",()=>pm.expect(pm.response.json().names).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P13 — Calentar categorías 1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P13 — Calentar categorías 2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/api/v1/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Request ID de ocho caracteres\", () => pm.expect(pm.response.headers.get(\"X-Request-Id\")).to.match(/^[a-f0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P13.4 — Aciertos de caché categorías",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/metrics/cache.gets?tag=name:categorias&tag=result:hit",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"COUNT de hits mayor que cero\",()=>{const count=pm.response.json().measurements.find(m=>m.statistic===\"COUNT\");pm.expect(count).to.exist;pm.expect(count.value).to.be.above(0);pm.collectionVariables.set(\"cacheHitsCategorias\",count.value);});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P13.5 — Peticiones y tiempos HTTP",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/metrics/http.server.requests",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mediciones disponibles\",()=>pm.expect(pm.response.json().measurements).to.be.an(\"array\").and.not.empty);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P13 — Info admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{backendUrl}}/actuator/info",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 — Encabezados Nginx (complemento P04/P05)",
+      "description": "Poner mainAsset y stylesAsset con los nombres actuales del build, SIN barra inicial. Postman no demuestra caché del navegador ni ejecución Angular; P02/P03/P06 deben hacerse en DevTools. index.html se solicita como archivo, sin redirecciones de rutas.",
+      "item": [
+        {
+          "name": "P05 — index.html no-cache",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{webUrl}}/index.html",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"HTML revalida\",()=>pm.expect(pm.response.headers.get(\"Cache-Control\")).to.include(\"no-cache\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P04 — mainAsset immutable",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{webUrl}}/{{mainAsset}}",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get(\"mainAsset\")) throw new Error(\"Completar mainAsset con el nombre del build actual\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Caché de un año immutable\",()=>{const h=pm.response.headers.get(\"Cache-Control\");pm.expect(h).to.include(\"max-age=31536000\");pm.expect(h).to.include(\"immutable\");});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P04 — stylesAsset immutable",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{webUrl}}/{{stylesAsset}}",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(!pm.collectionVariables.get(\"stylesAsset\")) throw new Error(\"Completar stylesAsset con el nombre del build actual\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Caché de un año immutable\",()=>{const h=pm.response.headers.get(\"Cache-Control\");pm.expect(h).to.include(\"max-age=31536000\");pm.expect(h).to.include(\"immutable\");});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "P06 complemento — fallback /productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{webUrl}}/productos",
+            "description": "Solo demuestra fallback del servidor. Capturar F5 y bytes en el navegador.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Respuesta HTML de la SPA\",()=>pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/html\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

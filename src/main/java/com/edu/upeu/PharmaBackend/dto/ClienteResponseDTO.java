@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClienteResponseDTO {
+    private String creadoPor;
+    private String modificadoPor;
     private Long id;
     private String dni;
     private String nombres;

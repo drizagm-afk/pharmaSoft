@@ -24,6 +24,7 @@ public class VentaMapper {
         String clienteNombre = venta.getCliente().getNombres() + " " + venta.getCliente().getApellidos();
 
         return new VentaResponseDTO(
+                venta.getCreadoPor(),
                 venta.getId(),
                 venta.getFecha(),
                 venta.getCliente().getId(),

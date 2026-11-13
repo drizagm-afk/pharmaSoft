@@ -17,7 +17,7 @@ spring:
     hibernate:
       ddl-auto: validate
 
-    show-sql: true
+    show-sql: false
 
     properties:
       hibernate:
@@ -37,3 +37,9 @@ app:
     expiracion-minutos: ${JWT_EXPIRACION_MINUTOS:60}
   cors:
     allowed-origins: http://localhost:5173,http://127.0.0.1:5173,http://localhost:4200,http://127.0.0.1:4200
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%X{requestId}] %logger{36} - %msg%n"

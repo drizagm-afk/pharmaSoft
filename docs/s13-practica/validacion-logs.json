@@ -1,0 +1,18 @@
+{
+  "fecha": "2026-11-05",
+  "bloque": "Request IDs y logs",
+  "pruebas": {
+    "tests": 80,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 10
+  },
+  "aprobadas": 70,
+  "cadenaSeguridadConRequestId": "Pasa",
+  "limpiezaMdc": "Pasa",
+  "datosSensiblesExcluidosDelLogAcceso": "Pasa",
+  "rotacionProduccionConfigurada": true,
+  "validacionManualProduccion": "Pendiente",
+  "oracleModificado": false,
+  "commitsRealizadosPorAsistente": false
+}

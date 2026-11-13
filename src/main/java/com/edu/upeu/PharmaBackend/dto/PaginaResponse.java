@@ -2,6 +2,7 @@ package com.edu.upeu.PharmaBackend.dto;
 
 import org.springframework.data.domain.Page;
 import java.util.List;
+import java.io.Serializable;
 
 public record PaginaResponse<T>(
         List<T> contenido,
@@ -10,7 +11,8 @@ public record PaginaResponse<T>(
         long totalElementos,
         int totalPaginas,
         boolean ultima
-) {
+) implements Serializable {
+    private static final long serialVersionUID = 1L;
     public static <T> PaginaResponse<T> de(Page<T> page) {
         return new PaginaResponse<>(page.getContent(), page.getNumber(), page.getSize(),
                 page.getTotalElements(), page.getTotalPages(), page.isLast());
