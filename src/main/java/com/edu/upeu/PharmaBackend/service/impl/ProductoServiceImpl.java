@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationEventPublisher;
+import com.edu.upeu.PharmaBackend.auditoria.EventoAuditoria;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -29,6 +31,7 @@ public class ProductoServiceImpl implements ProductoService {
     private static final Logger logger = LoggerFactory.getLogger(ProductoServiceImpl.class);
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final ApplicationEventPublisher eventos;
 
     @Override
     @Transactional
@@ -70,8 +73,13 @@ public class ProductoServiceImpl implements ProductoService {
                 new RecursosNoEncontradosException("Producto no encontrado con id: " + id)
         );
 
+        var precioAnterior = producto.getPrecio();
         ProductoMapper.ConvertFromRequest(producto, request, categoria);
         productoRepository.saveAndFlush(producto);
+        if (precioAnterior.compareTo(producto.getPrecio()) != 0) {
+            eventos.publishEvent(EventoAuditoria.de("PRECIO_MODIFICADO", "Producto",
+                    producto.getId(), precioAnterior + " -> " + producto.getPrecio()));
+        }
 
         return ProductoMapper.ConvertToResponse(producto);
     }
@@ -97,6 +105,8 @@ public class ProductoServiceImpl implements ProductoService {
             throw new ReglaNegocioException("El producto ya está inactivo.");
         }
         producto.setEstado(false);
+        eventos.publishEvent(EventoAuditoria.de("PRODUCTO_ELIMINADO", "Producto",
+                producto.getId(), producto.getNombre()));
     }
 
     @Override

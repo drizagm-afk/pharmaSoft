@@ -38,6 +38,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 class SeguridadIntegrationTest {
+    @Autowired AuditoriaEventoRepository auditoriaEventos;
+
+    @Test
+    void loginExitosoYFallidoPersistenEventoConRequestIdSinCredenciales() throws Exception {
+        String[] passwords = {"Incorrecta2026", "Password2026*"};
+        String[] acciones = {"LOGIN_FALLIDO", "LOGIN_EXITOSO"};
+        for (int i = 0; i < passwords.length; i++) {
+            var resultado = mvc.perform(post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"username\":\"admin\",\"password\":\"" + passwords[i] + "\"}"))
+                    .andExpect(status().is(i == 0 ? 401 : 200)).andReturn();
+            String requestId = resultado.getResponse().getHeader("X-Request-Id");
+            String accion = acciones[i];
+            assertThat(auditoriaEventos.findAll().stream()
+                    .filter(e -> requestId.equals(e.getRequestId())).toList())
+                    .singleElement().satisfies(e -> {
+                        assertThat(e.getUsuario()).isEqualTo("admin");
+                        assertThat(e.getAccion()).isEqualTo(accion);
+                        assertThat(e.getEntidad()).isEqualTo("Usuario");
+                        assertThat(e.getDetalle()).isNull();
+                        assertThat(e.getEntidadId()).isNull();
+                    });
+        }
+    }
+
     @Test
     void erroresDeControladorYSeguridadCompartenIdConLaCabecera() throws Exception {
         String admin = bearer("admin");

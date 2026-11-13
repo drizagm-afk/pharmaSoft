@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationEventPublisher;
+import com.edu.upeu.PharmaBackend.auditoria.EventoAuditoria;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -42,6 +44,7 @@ public class VentaServiceImpl implements VentaService {
     private final ClienteRepository clienteRepository;
     private final ProductoRepository productoRepository;
     private final EntityManager entityManager;
+    private final ApplicationEventPublisher eventos;
 
     @Override
     @Transactional
@@ -85,6 +88,8 @@ public class VentaServiceImpl implements VentaService {
         venta.setTotal(total);
 
         Venta guardada = ventaRepository.save(venta);
+        eventos.publishEvent(EventoAuditoria.de("VENTA_REGISTRADA", "Venta", guardada.getId(),
+                "total=" + guardada.getTotal() + " | items=" + guardada.getDetalles().size()));
 
         return VentaMapper.ConvertToResponse(guardada);
     }
