@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Set;
 import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 import com.edu.upeu.PharmaBackend.service.support.Paginacion;
+import com.edu.upeu.PharmaBackend.service.support.Busqueda;
+import org.springframework.data.domain.Page;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 
@@ -117,6 +119,18 @@ public class ProductoServiceImpl implements ProductoService {
                 .stream()
                 .map(ProductoMapper::ConvertToResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginaResponse<ProductoResponseDTO> buscarParaVenta(String texto, int pagina, int tamanio) {
+        var pageable = Paginacion.crear(pagina, tamanio, "nombre", "asc",
+                "nombre", "asc", Set.of("nombre"));
+        String normalizado = Busqueda.normalizar(texto);
+        var resultado = normalizado.isEmpty()
+                ? Page.<Producto>empty(pageable)
+                : productoRepository.buscarParaVenta(normalizado, pageable);
+        return PaginaResponse.de(resultado.map(ProductoMapper::ConvertToResponse));
     }
 
     @Override

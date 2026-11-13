@@ -16,6 +16,14 @@ import org.springframework.web.bind.annotation.*;
 public class ClienteController {
     private final ClienteService clienteService;
 
+    @GetMapping("/buscar")
+    public PaginaResponse<ClienteResponseDTO> buscarParaVenta(
+            @RequestParam(defaultValue = "") String texto,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "6") int tamanio) {
+        return clienteService.buscarParaVenta(texto, pagina, tamanio);
+    }
+
     //READ
     @GetMapping
     public ResponseEntity<PaginaResponse<ClienteResponseDTO>> getClientes(

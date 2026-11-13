@@ -1,0 +1,20 @@
+{
+  "reproduccion": {
+    "total": 2,
+    "fallidas": 2,
+    "errores": 0,
+    "omitidas": 0
+  },
+  "suiteCompleta": {
+    "total": 104,
+    "fallidas": 0,
+    "errores": 0,
+    "omitidas": 18
+  },
+  "busquedaYRedis": {
+    "total": 9,
+    "fallidas": 0,
+    "errores": 0,
+    "omitidas": 0
+  }
+}

@@ -16,6 +16,14 @@ import org.springframework.web.bind.annotation.*;
 public class ProductoController {
     private final ProductoService productoService;
 
+    @GetMapping("/buscar")
+    public PaginaResponse<ProductoResponseDTO> buscarParaVenta(
+            @RequestParam(defaultValue = "") String texto,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "6") int tamanio) {
+        return productoService.buscarParaVenta(texto, pagina, tamanio);
+    }
+
     //READ
     @GetMapping
     public ResponseEntity<PaginaResponse<ProductoResponseDTO>> getProductos(

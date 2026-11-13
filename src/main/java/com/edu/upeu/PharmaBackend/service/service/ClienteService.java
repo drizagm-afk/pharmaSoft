@@ -6,5 +6,6 @@ import com.edu.upeu.PharmaBackend.service.generic.CrudService;
 import com.edu.upeu.PharmaBackend.dto.PaginaResponse;
 
 public interface ClienteService extends CrudService<ClienteRequestDTO, ClienteResponseDTO, Long> {
+    PaginaResponse<ClienteResponseDTO> buscarParaVenta(String texto, int pagina, int tamanio);
     PaginaResponse<ClienteResponseDTO> listar(int pagina, int tamanio, String ordenarPor, String direccion);
 }
