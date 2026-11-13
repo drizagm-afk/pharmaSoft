@@ -6,6 +6,8 @@ import com.edu.upeu.PharmaBackend.entity.Cliente;
 public class ClienteMapper {
     static public ClienteResponseDTO ConvertToResponse(Cliente cliente) {
         return new ClienteResponseDTO(
+                cliente.getCreadoPor(),
+                cliente.getModificadoPor(),
                 cliente.getId(),
                 cliente.getDni(),
                 cliente.getNombres(),

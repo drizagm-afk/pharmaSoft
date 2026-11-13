@@ -7,6 +7,8 @@ import com.edu.upeu.PharmaBackend.entity.Categoria;
 public class CategoriaMapper {
     public static CategoriaResponseDTO ConvertToResponse(Categoria categoria){
         return new CategoriaResponseDTO(
+                categoria.getCreadoPor(),
+                categoria.getModificadoPor(),
                 categoria.getId(),
                 categoria.getNombre(),
                 categoria.getDescripcion(),

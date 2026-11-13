@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductoResponseDTO implements Serializable {
+    private String creadoPor;
+    private String modificadoPor;
     private static final long serialVersionUID = 1L;
     private Long id;
     private String nombre;

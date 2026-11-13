@@ -57,7 +57,7 @@ public class CategoriaServiceImpl implements CategoriaService {
         );
 
         CategoriaMapper.ConvertFromRequest(categoria, request);
-        categoriaRepository.save(categoria);
+        categoriaRepository.saveAndFlush(categoria);
 
         return CategoriaMapper.ConvertToResponse(categoria);
     }

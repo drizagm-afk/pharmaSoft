@@ -11,6 +11,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoriaResponseDTO implements Serializable {
+    private String creadoPor;
+    private String modificadoPor;
     private static final long serialVersionUID = 1L;
     private Long id;
     private String nombre;

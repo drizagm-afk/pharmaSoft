@@ -95,6 +95,7 @@ class CatalogoCacheIntegrationTest {
         categorias.read(categoriaId);
         consultas = estadisticas().getPrepareStatementCount();
         assertThat(categorias.read(categoriaId).getId()).isEqualTo(categoriaId);
+        assertThat(categorias.read(categoriaId).getCreadoPor()).isEqualTo("sistema");
         assertThat(estadisticas().getPrepareStatementCount()).isEqualTo(consultas);
     }
 
@@ -103,6 +104,8 @@ class CatalogoCacheIntegrationTest {
         productos.listar(0, 1, "nombre", "asc");
         long consultas = estadisticas().getPrepareStatementCount();
         assertThat(productos.listar(0, 1, "nombre", "asc").contenido()).hasSize(1);
+        assertThat(productos.listar(0, 1, "nombre", "asc").contenido().getFirst().getCreadoPor())
+                .isEqualTo("sistema");
         assertThat(estadisticas().getPrepareStatementCount()).isEqualTo(consultas);
         productos.listar(0, 2, "nombre", "desc");
         assertThat(redis.hasKey("s13-test::productos::0-1-nombre-asc")).isTrue();

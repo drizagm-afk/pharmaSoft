@@ -71,7 +71,7 @@ public class ProductoServiceImpl implements ProductoService {
         );
 
         ProductoMapper.ConvertFromRequest(producto, request, categoria);
-        productoRepository.save(producto);
+        productoRepository.saveAndFlush(producto);
 
         return ProductoMapper.ConvertToResponse(producto);
     }
